@@ -27,3 +27,20 @@ Keep using grep/read/edit for:
 If the graph looks stale, ask the user to run `AIDLC: Rescan AST Graph`. The
 extension also rescans automatically a few seconds after any source file save.
 <!-- aidlc:ast-graph:end -->
+
+<!-- em-team:start -->
+## EM-Team Integration
+
+This project includes EM-Team (vendored at `vendor/em-team/`) — a fullstack
+engineering agent system with 82 skills, 35 agents, and 24 workflows.
+
+Use `em:` prefixed commands to invoke EM-Team capabilities. Key commands:
+- `/em:new-feature` — idea to production
+- `/em:bug-fix` — systematic bug resolution
+- `/em:code-review` — 5-axis code review
+- `/em:architect` — architecture & technical design
+- `/em:planner` — create implementation plans
+- `/em:ship` — ship workflow (test → PR)
+
+Full catalog: `vendor/em-team/skills/SKILL-INDEX.md`
+<!-- em-team:end -->
