@@ -162,7 +162,7 @@ function downloadFile(url: string, dst: string, hops = 0): Promise<void> {
     }
     const tmp = `${dst}.part`;
     const file = fs.createWriteStream(tmp);
-    https.get(url, { headers: { 'User-Agent': 'aidlc-vscode' } }, (res) => {
+    https.get(url, { headers: { 'User-Agent': 'edlc-vscode' } }, (res) => {
       if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         file.close();
         fs.promises.unlink(tmp).catch(() => {});
@@ -197,7 +197,7 @@ function downloadFile(url: string, dst: string, hops = 0): Promise<void> {
 
 async function fetchExpectedSha(url: string): Promise<string> {
   return new Promise((resolve) => {
-    https.get(url, { headers: { 'User-Agent': 'aidlc-vscode' } }, (res) => {
+    https.get(url, { headers: { 'User-Agent': 'edlc-vscode' } }, (res) => {
       if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         // Follow one hop — sha files redirect just like archives.
         fetchExpectedSha(new URL(res.headers.location, url).toString()).then(resolve);

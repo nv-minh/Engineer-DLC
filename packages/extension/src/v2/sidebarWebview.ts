@@ -7,7 +7,7 @@
  * surfaces the slash commands the user has wired up. Everything that needs
  * real estate (forms, cards, workflow editor) lives in the Builder panel.
  *
- * The data source is `.aidlc/workspace.yaml`. State is rebuilt on every
+ * The data source is `.edlc/workspace.yaml`. State is rebuilt on every
  * file change via a workspace watcher (set up in extension.ts).
  */
 
@@ -17,7 +17,7 @@ import * as os from 'os';
 
 import * as fs from 'fs';
 
-const DEMO_DIR_NAME = 'aidlc-demo-project';
+const DEMO_DIR_NAME = 'edlc-demo-project';
 
 import { readYaml } from './yamlIO';
 import {
@@ -27,8 +27,8 @@ import {
   normalizeStep,
   resolvePath,
   discoverAssets,
-} from '@aidlc/core';
-import type { PipelineConfig } from '@aidlc/core';
+} from '@edlc/core';
+import type { PipelineConfig } from '@edlc/core';
 import { listEpics } from './epicsList';
 import type { PresetStore } from './presetStore';
 import { themeManager } from './themeManager';
@@ -45,7 +45,7 @@ import { missingBundleHtml } from './webviewBundleGuard';
 
 // VS Code reuses output channels by name, so this resolves to the same
 // channel created in extension.ts activate().
-const output = vscode.window.createOutputChannel('AIDLC');
+const output = vscode.window.createOutputChannel('EDLC');
 
 interface TemplateRef {
   id: string;
@@ -113,7 +113,7 @@ interface SidebarState {
   pipelines: PipelineRef[];
   /** All existing run ids (any status). */
   runIds: string[];
-  /** True when ~/aidlc-demo-project already exists — surfaced so the
+  /** True when ~/edlc-demo-project already exists — surfaced so the
    * sidebar can pop an inline "re-seed / open-as-is / cancel" modal
    * instead of letting the host show a VS Code notification. */
   demoProjectExists: boolean;
@@ -167,12 +167,12 @@ function buildState(
 
   // Discovered skills + agents from .claude/ (project) and ~/.claude/
   // (global). These are independent of workspace.yaml — they exist as
-  // long as the folder is open. The disk scan returns aidlc-scope items
+  // long as the folder is open. The disk scan returns edlc-scope items
   // too, but for counting we ignore those and rely on the workspace.yaml
-  // declarations (the runtime source of truth for AIDLC pipelines).
+  // declarations (the runtime source of truth for EDLC pipelines).
   const discovered = discoverAssets(root);
-  const claudeSkills = discovered.skills.filter((s) => s.scope !== 'aidlc');
-  const claudeAgents = discovered.agents.filter((a) => a.scope !== 'aidlc');
+  const claudeSkills = discovered.skills.filter((s) => s.scope !== 'edlc');
+  const claudeAgents = discovered.agents.filter((a) => a.scope !== 'edlc');
   const recentEpics = allEpics.slice(0, 3).map((e) => ({
     id: e.id,
     title: e.title,
@@ -185,7 +185,7 @@ function buildState(
   // as their first action.
   const { builtinTemplates, projectTemplates } = listTemplates(presetStore, root);
 
-  // Active pipeline runs live in .aidlc/runs/ and are independent of the
+  // Active pipeline runs live in .edlc/runs/ and are independent of the
   // workspace doc — surface them whenever the folder is open.
   const activeRuns = listActiveRuns(root);
   const runIds = listAllRunIds(root);
@@ -223,7 +223,7 @@ function buildState(
     // free-form `name:` field (see comment in builderWebview.ts).
     workspaceName: folder.name,
     configExists: true,
-    // Counts span all 3 scopes: workspace.yaml entries (aidlc) + .claude/
+    // Counts span all 3 scopes: workspace.yaml entries (edlc) + .claude/
     // (project) + ~/.claude/ (global). Same total the Builder tab shows.
     agentsCount: doc.agents.length + claudeAgents.length,
     skillsCount: doc.skills.length + claudeSkills.length,
@@ -346,7 +346,7 @@ function listTemplates(
 }
 
 export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'aidlcSidebar';
+  public static readonly viewType = 'edlcSidebar';
   private view: vscode.WebviewView | undefined;
 
   // MCP list is loaded lazily via `claude mcp list`; the CLI runs a health
@@ -424,10 +424,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         return;
       }
       case 'openBuilder':
-        await vscode.commands.executeCommand('aidlc.openBuilder');
+        await vscode.commands.executeCommand('edlc.openBuilder');
         return;
       case 'openClaude':
-        await vscode.commands.executeCommand('aidlc.openClaudeTerminal');
+        await vscode.commands.executeCommand('edlc.openClaudeTerminal');
         return;
       case 'openProject': {
         const picked = await vscode.window.showOpenDialog({
@@ -452,7 +452,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         await vscode.commands.executeCommand('workbench.action.closeFolder');
         return;
       case 'init':
-        await vscode.commands.executeCommand('aidlc.initWorkspace');
+        await vscode.commands.executeCommand('edlc.initWorkspace');
         return;
       case 'loadDemoProject': {
         // mode is set by the React modal so the host skips the VS Code
@@ -460,17 +460,17 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         const mode = msg.mode === 'reseed' || msg.mode === 'open-as-is'
           ? msg.mode
           : undefined;
-        await vscode.commands.executeCommand('aidlc.loadDemoProject', mode);
+        await vscode.commands.executeCommand('edlc.loadDemoProject', mode);
         return;
       }
       case 'startEpic':
-        await vscode.commands.executeCommand('aidlc.startEpic');
+        await vscode.commands.executeCommand('edlc.startEpic');
         return;
       case 'requestStartEpic':
         WorkspaceWebview.triggerStartEpic(this.extensionUri);
         return;
       case 'openEpicsList':
-        await vscode.commands.executeCommand('aidlc.openEpicsList');
+        await vscode.commands.executeCommand('edlc.openEpicsList');
         return;
       case 'openEpicState': {
         const statePath = String(msg.path ?? '');
@@ -491,7 +491,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         const id = String(msg.id ?? '');
         if (!id) { return; }
         await vscode.commands.executeCommand(
-          'aidlc.applyPreset',
+          'edlc.applyPreset',
           id,
           msg.skipConfirm === true,
         );
@@ -500,7 +500,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       case 'savePresetInline': {
         const draft = msg.draft;
         if (!draft || typeof draft !== 'object') { return; }
-        await vscode.commands.executeCommand('aidlc.savePresetInline', draft);
+        await vscode.commands.executeCommand('edlc.savePresetInline', draft);
         return;
       }
       case 'rerunStepInline': {
@@ -516,7 +516,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         const feedback = String(msg.feedback ?? '');
         if (!slash || !runId) { return; }
         await vscode.commands.executeCommand(
-          'aidlc.runStepWithFeedback',
+          'edlc.runStepWithFeedback',
           slash,
           runId,
           feedback,
@@ -532,7 +532,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         return;
       }
       case 'startPipelineRun':
-        await vscode.commands.executeCommand('aidlc.startPipelineRun');
+        await vscode.commands.executeCommand('edlc.startPipelineRun');
         return;
       case 'markStepDone':
       case 'approveStep':
@@ -541,14 +541,14 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       case 'runAutoReview':
       case 'openRunState': {
         const runId = String(msg.runId ?? '');
-        const cmd = `aidlc.${msg.type}`;
+        const cmd = `edlc.${msg.type}`;
         await vscode.commands.executeCommand(cmd, runId || undefined);
         return;
       }
       case 'deleteRun': {
         const runId = String(msg.runId ?? '');
         await vscode.commands.executeCommand(
-          'aidlc.deleteRun',
+          'edlc.deleteRun',
           runId || undefined,
           msg.confirmed === true,
         );
@@ -637,7 +637,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
            font-src ${cspSource} https: data:;
            style-src ${cspSource} 'unsafe-inline';
            script-src 'nonce-${nonce}' ${cspSource};">
-<title>AIDLC</title>
+<title>EDLC</title>
 <link rel="stylesheet" href="${cssUri}">
 </head>
 <body>
@@ -645,8 +645,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 <script nonce="${nonce}">
 window.BRAND_ICON_URI = ${JSON.stringify(iconUri)};
 window.EXTENSION_VERSION = ${JSON.stringify(version)};
-window.__AIDLC_INITIAL_STATE__ = ${JSON.stringify(initialState)};
-window.__AIDLC_INITIAL_THEME__ = ${JSON.stringify(initialTheme)};
+window.__EDLC_INITIAL_STATE__ = ${JSON.stringify(initialState)};
+window.__EDLC_INITIAL_THEME__ = ${JSON.stringify(initialTheme)};
 </script>
 <script type="module" nonce="${nonce}" src="${entryUri}"></script>
 </body>

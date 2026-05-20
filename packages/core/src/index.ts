@@ -1,4 +1,4 @@
-// AIDLC core — public exports.
+// EDLC core — public exports.
 //
 // This package is pure TypeScript. No `import 'vscode'`. The extension layer
 // (packages/extension) imports from here; the core has zero knowledge of the
@@ -103,4 +103,4 @@ export type {
   StepHistoryEntry,
 } from './runs/RunState';
 
-export const AIDLC_CORE_VERSION = '0.1.0';
+export const EDLC_CORE_VERSION = '0.1.0';

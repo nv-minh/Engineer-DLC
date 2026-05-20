@@ -1,5 +1,5 @@
 /**
- * Start Epic wizard — `aidlc.startEpic`.
+ * Start Epic wizard — `edlc.startEpic`.
  *
  * An "epic" is a *run instance* of a pipeline (or single agent) bound to
  * concrete project-specific values:
@@ -26,8 +26,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { stepAgentId, startRun, RunStateStore } from '@aidlc/core';
-import type { PipelineConfig } from '@aidlc/core';
+import { stepAgentId, startRun, RunStateStore } from '@edlc/core';
+import type { PipelineConfig } from '@edlc/core';
 
 import { readYaml, type YamlDocument } from './yamlIO';
 
@@ -81,27 +81,27 @@ const CAPABILITY_PROMPTS: Record<string, CapabilityPrompt> = {
 export async function startEpicCommand(): Promise<void> {
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    void vscode.window.showWarningMessage('AIDLC: Open a project first.');
+    void vscode.window.showWarningMessage('EDLC: Open a project first.');
     return;
   }
 
   const doc = readYaml(root);
   if (!doc) {
     const choice = await vscode.window.showWarningMessage(
-      'AIDLC: No workspace.yaml in this project. Load a template first?',
+      'EDLC: No workspace.yaml in this project. Load a template first?',
       'Load Template', 'Init Sample',
     );
     if (choice === 'Load Template') {
-      await vscode.commands.executeCommand('aidlc.applyPreset');
+      await vscode.commands.executeCommand('edlc.applyPreset');
     } else if (choice === 'Init Sample') {
-      await vscode.commands.executeCommand('aidlc.initWorkspace');
+      await vscode.commands.executeCommand('edlc.initWorkspace');
     }
     return;
   }
 
   if (doc.agents.length === 0) {
     void vscode.window.showWarningMessage(
-      'AIDLC: No agents in workspace.yaml. Add an agent before starting an epic.',
+      'EDLC: No agents in workspace.yaml. Add an agent before starting an epic.',
     );
     return;
   }
@@ -205,7 +205,7 @@ export async function startEpicCommand(): Promise<void> {
     'Open Claude CLI', 'Open state.json',
   );
   if (choice === 'Open Claude CLI') {
-    await vscode.commands.executeCommand('aidlc.openClaudeTerminal');
+    await vscode.commands.executeCommand('edlc.openClaudeTerminal');
   } else if (choice === 'Open state.json') {
     const docOpen = await vscode.workspace.openTextDocument(path.join(epicDir, 'state.json'));
     await vscode.window.showTextDocument(docOpen, { preview: false });

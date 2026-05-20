@@ -11,7 +11,7 @@ import {
   type PipelineConfig,
   type AgentConfig,
   type SkillLoader,
-} from '@aidlc/core';
+} from '@edlc/core';
 
 // ── Run loading ───────────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ export function requireRun(root: string, runId: string): RunState {
     if (all.length > 0) {
       console.error(chalk.dim(`Available runs: ${all.map(r => r.runId).join(', ')}`));
     } else {
-      console.error(chalk.dim('No runs yet. Run: aidlc run start <pipelineId>'));
+      console.error(chalk.dim('No runs yet. Run: edlc run start <pipelineId>'));
     }
     process.exit(1);
   }
@@ -52,7 +52,7 @@ export function requirePipeline(root: string, pipelineId: string): {
     if (ids.length > 0) {
       console.error(chalk.dim(`Available: ${ids.join(', ')}`));
     } else {
-      console.error(chalk.dim('No pipelines defined. Run: aidlc pipeline add --id <id> --steps ...'));
+      console.error(chalk.dim('No pipelines defined. Run: edlc pipeline add --id <id> --steps ...'));
     }
     process.exit(1);
   }

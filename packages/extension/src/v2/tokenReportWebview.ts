@@ -20,7 +20,7 @@ interface ReportPanelState {
 }
 
 export class TokenReportWebview {
-  public static readonly viewType = 'aidlcTokenReport';
+  public static readonly viewType = 'edlcTokenReport';
   private static current: TokenReportWebview | undefined;
   private readonly disposables: vscode.Disposable[] = [];
   private state: ReportPanelState = {
@@ -66,7 +66,7 @@ export class TokenReportWebview {
 
   private async loadReport(): Promise<void> {
     if (this.loadPromise) { return this.loadPromise; }
-    const cfg = vscode.workspace.getConfiguration('aidlc.tokenMonitor');
+    const cfg = vscode.workspace.getConfiguration('edlc.tokenMonitor');
     const windowDays = Math.max(1, cfg.get<number>('suggestionWindowDays', 30));
     this.state = { ...this.state, loading: true, error: null, windowDays };
     this.refresh();
@@ -146,8 +146,8 @@ export class TokenReportWebview {
 <body>
 <div id="app"></div>
 <script nonce="${nonce}">
-window.__AIDLC_INITIAL_STATE__ = ${JSON.stringify(this.state)};
-window.__AIDLC_INITIAL_THEME__ = ${JSON.stringify(initialTheme)};
+window.__EDLC_INITIAL_STATE__ = ${JSON.stringify(this.state)};
+window.__EDLC_INITIAL_THEME__ = ${JSON.stringify(initialTheme)};
 </script>
 <script type="module" nonce="${nonce}" src="${entryUri}"></script>
 </body>

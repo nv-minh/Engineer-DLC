@@ -19,15 +19,15 @@ agents:
     name: "Special Agent"
     skill: my-skill
     runner: custom
-    runner_path: ./.aidlc/runners/my-runner.js
+    runner_path: ./.edlc/runners/my-runner.js
 
 skills:
   - id: convert-test
     builtin: true
   - id: my-doc-skill
-    path: ./.aidlc/skills/my-doc-skill.md
+    path: ./.edlc/skills/my-doc-skill.md
   - id: my-skill
-    path: ./.aidlc/skills/my-skill.md
+    path: ./.edlc/skills/my-skill.md
 
 environment:
   ANTHROPIC_API_KEY: "${env:ANTHROPIC_API_KEY}"

@@ -1,7 +1,7 @@
 /**
  * Workspace preset library.
  *
- * Captures a snapshot of `.aidlc/workspace.yaml` + every referenced skill
+ * Captures a snapshot of `.edlc/workspace.yaml` + every referenced skill
  * `.md` file into a single JSON document, so the user can save what they
  * built in project A and re-apply it to project B without re-doing the
  * wizard flow. The skill markdown is inlined (not just the file path) so
@@ -10,7 +10,7 @@
  *
  * Storage layout (since 0.8.x):
  *   - User-saved templates live **inside the project** at
- *     `<workspaceRoot>/.aidlc/templates/<id>.json` so they travel with
+ *     `<workspaceRoot>/.edlc/templates/<id>.json` so they travel with
  *     the repo and the team can share via git.
  *   - Built-in templates ship with the extension (e.g. SDLC Pipeline) and
  *     are loaded via the `builtinLoader` callback at list time.
@@ -61,7 +61,7 @@ export class PresetStore {
 
   /** Resolve the project's user-template directory. */
   private projectDir(workspaceRoot: string): string {
-    return path.join(workspaceRoot, '.aidlc', 'templates');
+    return path.join(workspaceRoot, '.edlc', 'templates');
   }
 
   /**
@@ -155,8 +155,8 @@ export class PresetStore {
 
   /**
    * Apply a preset to a workspace root. Writes:
-   *   <root>/.aidlc/workspace.yaml          (preset.workspace + caller's name)
-   *   <root>/.aidlc/skills/<id>.md          (one per inlined skill)
+   *   <root>/.edlc/workspace.yaml          (preset.workspace + caller's name)
+   *   <root>/.edlc/skills/<id>.md          (one per inlined skill)
    *
    * Existing files are NOT overwritten unless `overwrite: true`. The caller
    * is expected to confirm with the user before passing that flag.
@@ -167,15 +167,15 @@ export class PresetStore {
     workspaceName: string,
     options: { overwrite?: boolean } = {},
   ): { written: string[]; skipped: string[] } {
-    const aidlcDir = path.join(workspaceRoot, '.aidlc');
-    const skillsDir = path.join(aidlcDir, 'skills');
+    const edlcDir = path.join(workspaceRoot, '.edlc');
+    const skillsDir = path.join(edlcDir, 'skills');
     fs.mkdirSync(skillsDir, { recursive: true });
 
     const written: string[] = [];
     const skipped: string[] = [];
 
     // 1. Write workspace.yaml
-    const workspaceFile = path.join(aidlcDir, 'workspace.yaml');
+    const workspaceFile = path.join(edlcDir, 'workspace.yaml');
     if (fs.existsSync(workspaceFile) && !options.overwrite) {
       skipped.push(workspaceFile);
     } else {
@@ -191,9 +191,9 @@ export class PresetStore {
     }
 
     // 2. Write each skill .md, but only if the declaration points inside
-    //    `.aidlc/skills/`. Built-in presets now reference `~/.claude/skills/...`
+    //    `.edlc/skills/`. Built-in presets now reference `~/.claude/skills/...`
     //    files managed by `globalDefaultsInstaller`; writing a second copy
-    //    under `.aidlc/skills/` would diverge over time and re-introduces the
+    //    under `.edlc/skills/` would diverge over time and re-introduces the
     //    multi-preset collision (same `plan.md` overwriting between iOS / Web).
     const skills = (preset.workspace.skills as Array<Record<string, unknown>>) ?? [];
     for (const skill of skills) {
@@ -202,7 +202,7 @@ export class PresetStore {
       if (!content) { continue; }
       const declaredPath = typeof skill.path === 'string' ? skill.path : '';
       // External (e.g. `~/.claude/...`) or absolute paths → managed elsewhere.
-      if (!declaredPath.startsWith('./.aidlc/skills/') && !declaredPath.startsWith('.aidlc/skills/')) {
+      if (!declaredPath.startsWith('./.edlc/skills/') && !declaredPath.startsWith('.edlc/skills/')) {
         continue;
       }
       const skillFile = path.join(skillsDir, `${id}.md`);

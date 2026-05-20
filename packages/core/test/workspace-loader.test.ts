@@ -14,18 +14,18 @@ const FIXTURE = path.join(__dirname, 'fixtures', 'qa-workspace.yaml');
 
 /**
  * Build a temporary workspace directory layout:
- *   <tmp>/.aidlc/workspace.yaml
- *   <tmp>/.aidlc/skills/my-doc-skill.md
- *   <tmp>/.aidlc/skills/my-skill.md
+ *   <tmp>/.edlc/workspace.yaml
+ *   <tmp>/.edlc/skills/my-doc-skill.md
+ *   <tmp>/.edlc/skills/my-skill.md
  *
  * Returns the workspace root + cleanup fn.
  */
 function makeTempWorkspace(yamlContent: string): { root: string; cleanup: () => void } {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'aidlc-test-'));
-  const aidlcDir = path.join(root, '.aidlc');
-  const skillsDir = path.join(aidlcDir, 'skills');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'edlc-test-'));
+  const edlcDir = path.join(root, '.edlc');
+  const skillsDir = path.join(edlcDir, 'skills');
   fs.mkdirSync(skillsDir, { recursive: true });
-  fs.writeFileSync(path.join(aidlcDir, 'workspace.yaml'), yamlContent);
+  fs.writeFileSync(path.join(edlcDir, 'workspace.yaml'), yamlContent);
   fs.writeFileSync(
     path.join(skillsDir, 'my-doc-skill.md'),
     '# Doc skill\nWrite great docs.\n',
@@ -58,7 +58,7 @@ describe('WorkspaceLoader', () => {
     expect(loaded.config.name).toBe('QA Workspace');
     expect(loaded.config.agents).toHaveLength(3);
     expect(loaded.configPath).toBe(
-      path.join(workspace.root, '.aidlc', 'workspace.yaml'),
+      path.join(workspace.root, '.edlc', 'workspace.yaml'),
     );
   });
 
@@ -95,8 +95,8 @@ describe('WorkspaceLoader', () => {
     expect(loaded.skills.has('nope')).toBe(false);
   });
 
-  it('throws WorkspaceNotFoundError when .aidlc/workspace.yaml is missing', () => {
-    const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'aidlc-empty-'));
+  it('throws WorkspaceNotFoundError when .edlc/workspace.yaml is missing', () => {
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'edlc-empty-'));
     try {
       expect(() => WorkspaceLoader.load(empty)).toThrow(WorkspaceNotFoundError);
     } finally {

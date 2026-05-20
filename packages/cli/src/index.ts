@@ -21,8 +21,8 @@ const { version } = require('../package.json') as { version: string };
 const program = new Command();
 
 program
-  .name('aidlc')
-  .description('AIDLC terminal CLI — drive workspace.yaml pipelines from any terminal')
+  .name('edlc')
+  .description('EDLC terminal CLI — drive workspace.yaml pipelines from any terminal')
   .version(version)
   .option('-w, --workspace <path>', 'workspace root (defaults to cwd)');
 

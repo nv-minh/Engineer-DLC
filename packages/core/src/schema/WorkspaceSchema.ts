@@ -1,7 +1,7 @@
 /**
- * Zod schema for `.aidlc/workspace.yaml`.
+ * Zod schema for `.edlc/workspace.yaml`.
  *
- * Single source of truth for what a valid AIDLC workspace looks like.
+ * Single source of truth for what a valid EDLC workspace looks like.
  * Everything else in the loader is structurally typed off `WorkspaceConfig`,
  * so adding a field here automatically propagates to the loader, runner,
  * sidebar renderer, etc. — no manual interface duplication.
@@ -18,9 +18,9 @@ import { z } from 'zod';
 const SkillSchema = z
   .object({
     id: z.string().min(1),
-    /** True for skills bundled with @aidlc/core (no path needed). */
+    /** True for skills bundled with @edlc/core (no path needed). */
     builtin: z.boolean().optional(),
-    /** Relative path to a custom .md skill, e.g. ./.aidlc/skills/foo.md */
+    /** Relative path to a custom .md skill, e.g. ./.edlc/skills/foo.md */
     path: z.string().optional(),
   })
   .refine((s) => s.builtin || s.path, {
@@ -270,7 +270,7 @@ const StateSchema = z.object({
 
 /**
  * Per-project sidebar layout. Workspaces declare which view types appear
- * in the `aidlcSidebar` panel. If omitted, sidebar shows defaults
+ * in the `edlcSidebar` panel. If omitted, sidebar shows defaults
  * (agents-list + run-history).
  *
  * View types are enumerated here to keep the contract closed — a new view

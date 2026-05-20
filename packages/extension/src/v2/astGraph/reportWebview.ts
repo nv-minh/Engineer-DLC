@@ -60,7 +60,7 @@ function stripNoise(text: string): string {
 }
 
 export class AstGraphReportWebview {
-  public static readonly viewType = 'aidlcAstGraphReport';
+  public static readonly viewType = 'edlcAstGraphReport';
   private static current: AstGraphReportWebview | undefined;
   private readonly disposables: vscode.Disposable[] = [];
   private loading = false;
@@ -98,8 +98,8 @@ export class AstGraphReportWebview {
       null,
       this.disposables,
     );
-    // Mirror the AIDLC theme override into this webview so the user's
-    // auto/light/dark toggle (driven from other AIDLC views) reaches us.
+    // Mirror the EDLC theme override into this webview so the user's
+    // auto/light/dark toggle (driven from other EDLC views) reaches us.
     this.disposables.push(themeManager.register(this.panel.webview));
     void this.refresh();
   }
@@ -241,7 +241,7 @@ export class AstGraphReportWebview {
    * Auto mode (default): every --ast-* token falls through to a
    *   --vscode-* variable so we inherit whatever VS Code currently shows.
    * Forced light/dark (data-theme attribute set by JS): the tokens flip
-   *   to a hardcoded palette so AIDLC's theme toggle wins over VS Code.
+   *   to a hardcoded palette so EDLC's theme toggle wins over VS Code.
    * Only the *neutral* surface colours are forced; semantic accents
    *   (charts, symbolIcon-*) keep using VS Code's variables since they
    *   already contrast well in both themes.
@@ -985,7 +985,7 @@ window.addEventListener('message', (ev) => {
     return;
   }
   if (msg.type === 'themeOverride') {
-    // Broadcast from themeManager when another AIDLC panel toggles.
+    // Broadcast from themeManager when another EDLC panel toggles.
     if (msg.mode === 'auto' || msg.mode === 'light' || msg.mode === 'dark') {
       applyTheme(msg.mode);
     }

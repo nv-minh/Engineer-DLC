@@ -1,6 +1,6 @@
-# @aidlc/core
+# @edlc/core
 
-AIDLC core engine — workspace loader, runner registry, pipeline executor.
+EDLC core engine — workspace loader, runner registry, pipeline executor.
 
 **Pure TypeScript.** No `import 'vscode'`. Designed to run standalone (CLI, tests, future cloud) outside the VS Code extension host.
 

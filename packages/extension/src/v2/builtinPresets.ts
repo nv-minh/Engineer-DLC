@@ -96,7 +96,7 @@ const PHASES_SEQUENTIAL: PhaseDef[] = [
     inputs: 'Tech design, test plan, project coding rules',
     outputs: 'Code + unit tests on feature branch, PR opened',
     artifact: 'feature/<EPIC>-<slug>',
-    humanReview: true, autoReview: true, autoReviewRunner: '.aidlc/scripts/ci.sh',
+    humanReview: true, autoReview: true, autoReviewRunner: '.edlc/scripts/ci.sh',
     // Developer needs full file access + GitHub for PR / commit operations.
     capabilities: ['files', 'github'],
   },
@@ -224,7 +224,7 @@ into working code on a feature branch.
  * Built-in workflow descriptor. One entry per domain-specialized pipeline.
  *
  * - `id`            : preset id stored on disk (e.g. `sdlc-pipeline`,
- *                     `ios-native-pipeline`). Used by `aidlc.applyPreset`.
+ *                     `ios-native-pipeline`). Used by `edlc.applyPreset`.
  * - `pipelineId`    : pipeline.id written into workspace.yaml (e.g.
  *                     `sdlc-full`, `ios-native-full`). Used by the runner.
  * - `name`          : human label shown in pickers / panel.
@@ -295,7 +295,7 @@ export function getBuiltinWorkflow(id: string): BuiltinWorkflow | undefined {
 /**
  * Look up a built-in workflow by the pipeline id written into
  * `workspace.yaml` (e.g. `ios-native-full`). Used by the webview to know
- * which artifact template bundle to drop into `.aidlc/aidlc-templates/<id>/`.
+ * which artifact template bundle to drop into `.edlc/edlc-templates/<id>/`.
  */
 export function getBuiltinWorkflowByPipelineId(pipelineId: string): BuiltinWorkflow | undefined {
   return BUILTIN_BY_PIPELINE_ID.get(pipelineId);
@@ -351,12 +351,12 @@ export function loadBuiltinPreset(extensionPath: string, workflow: BuiltinWorkfl
 
   // Layout (3-layer: persona × skill × phase):
   //   - workspace.yaml `agents:` — one entry per *unique persona*
-  //     (aidlc-po, aidlc-qa, …). `skills:` lists every phase id this
+  //     (edlc-po, edlc-qa, …). `skills:` lists every phase id this
   //     persona handles, so the user can see at a glance "QA does
   //     test-plan, generate-test-cases, execute-test".
   //   - workspace.yaml `skills:` — one entry per *phase* (plan,
   //     design, test-plan, …). Each points at the composed skill file
-  //     at `~/.claude/skills/aidlc-<phase>.md` (persona + phase work
+  //     at `~/.claude/skills/edlc-<phase>.md` (persona + phase work
   //     inlined by globalDefaultsInstaller).
   //   - workspace.yaml `slash_commands:` — one per phase, slash name
   //     matches phase id, mapped to the persona that runs it.
@@ -375,13 +375,13 @@ export function loadBuiltinPreset(extensionPath: string, workflow: BuiltinWorkfl
     phasesByPersona.set(phase.persona, list);
   }
 
-  // Skill IDs in workspace.yaml carry the `aidlc-` prefix so they match
-  // the on-disk filenames (`~/.claude/skills/aidlc-<phase>.md`) — this is
+  // Skill IDs in workspace.yaml carry the `edlc-` prefix so they match
+  // the on-disk filenames (`~/.claude/skills/edlc-<phase>.md`) — this is
   // also what the user sees on the per-step skill picker, so the displayed
-  // chips align with the actual global skill files (aidlc-test-plan,
-  // aidlc-execute-test, …) instead of bare phase ids that looked like
+  // chips align with the actual global skill files (edlc-test-plan,
+  // edlc-execute-test, …) instead of bare phase ids that looked like
   // unfamiliar custom names.
-  const skillIdOf = (p: PhaseDef): string => `aidlc-${p.id}`;
+  const skillIdOf = (p: PhaseDef): string => `edlc-${p.id}`;
 
   const agents: Array<Record<string, unknown>> = [];
   for (const [persona, personaPhases] of phasesByPersona) {
@@ -391,7 +391,7 @@ export function loadBuiltinPreset(extensionPath: string, workflow: BuiltinWorkfl
       for (const c of p.capabilities ?? []) { caps.add(c); }
     }
     const agent: Record<string, unknown> = {
-      id: `aidlc-${persona}`,
+      id: `edlc-${persona}`,
       name: persona.replace(/\b\w/g, (c) => c.toUpperCase()).replace(/-/g, ' '),
       // Every phase this persona handles becomes one of its skills.
       // Step.skill picks which one for that particular step.
@@ -409,12 +409,12 @@ export function loadBuiltinPreset(extensionPath: string, workflow: BuiltinWorkfl
   // self-contained prompt.
   const skills: Array<Record<string, unknown>> = workflow.phases.map((p) => ({
     id: skillIdOf(p),
-    path: `~/.claude/skills/aidlc-${p.id}.md`,
+    path: `~/.claude/skills/edlc-${p.id}.md`,
   }));
 
   const slashCommands: Array<Record<string, unknown>> = workflow.phases.map((p) => ({
     name: `/${p.id}`,
-    agent: `aidlc-${p.persona}`,
+    agent: `edlc-${p.persona}`,
   }));
 
   const pipeline = {
@@ -428,7 +428,7 @@ export function loadBuiltinPreset(extensionPath: string, workflow: BuiltinWorkfl
       const producesPath = artifactPathFor(p);
       const step: Record<string, unknown> = {
         name: p.id,
-        agent: `aidlc-${p.persona}`,
+        agent: `edlc-${p.persona}`,
         skills: [skillIdOf(p)],
         enabled: true,
         requires: [],
@@ -439,7 +439,7 @@ export function loadBuiltinPreset(extensionPath: string, workflow: BuiltinWorkfl
       if (p.dependsOn && p.dependsOn.length > 0) {
         // Deps reference phase ids (step.name), not personas — multiple
         // steps backed by the same persona stay distinct in the DAG
-        // (test-plan ⤴ plan, generate-test-cases ⤴ test-plan, both as aidlc-qa).
+        // (test-plan ⤴ plan, generate-test-cases ⤴ test-plan, both as edlc-qa).
         step.depends_on = p.dependsOn;
       }
       if (p.autoReview && p.autoReviewRunner) {
@@ -495,7 +495,7 @@ function composeSkill(persona: string, instruction: string, phaseId: string, wor
     .replace(/^.*Reference `?\.?\.?\/?\.claude\/agents\/[^\n]*\n/gm, '');
 
   return [
-    `<!-- Composed by AIDLC Flow built-in preset "${workflow.id}" — phase: ${phaseId} -->`,
+    `<!-- Composed by EDLC Flow built-in preset "${workflow.id}" — phase: ${phaseId} -->`,
     '',
     '## Persona',
     '',
@@ -524,11 +524,11 @@ export function getBuiltinPipelineSummary(workflow: BuiltinWorkflow) {
     on_failure: 'stop' as const,
     steps: workflow.phases.map((p) => ({
       // `name` = phase id (slash command + display label); `agent` =
-      // persona file (aidlc-po, aidlc-qa, …); `skills` = phase-scoped
+      // persona file (edlc-po, edlc-qa, …); `skills` = phase-scoped
       // skill list. Mirrors what `loadBuiltinPreset` writes into
       // workspace.yaml.
       name: p.id,
-      agent: `aidlc-${p.persona}`,
+      agent: `edlc-${p.persona}`,
       skills: [p.id],
       enabled: true,
       produces: [] as string[],
@@ -562,12 +562,12 @@ export function getAllBuiltinPipelineSummaries() {
 
 /**
  * Generate the content of `.claude/commands/<phase.id>.md` for a given
- * built-in phase. Inlines the composed skill + AIDLC task wiring (read
+ * built-in phase. Inlines the composed skill + EDLC task wiring (read
  * state/inputs, write artifact, tell user to mark done).
  *
  * For phases whose artifact is not a plain file (implement → branch,
  * release → tag), we still ask Claude to write a summary .md to the
- * artifacts/ folder so the AIDLC gate can validate something exists.
+ * artifacts/ folder so the EDLC gate can validate something exists.
  */
 export function builtinClaudeCommand(
   phase: PhaseDef,
@@ -576,8 +576,8 @@ export function builtinClaudeCommand(
 ): string {
   const isFilePath = !phase.artifact.includes('<') && !phase.artifact.includes('>');
   const artifactInstruction = isFilePath
-    ? `3. Write your output to \`${epicRoot}/$ARGUMENTS/artifacts/${phase.artifact}\`. The AIDLC validator checks for this file when the step is marked done.`
-    : `3. Complete the work (${phase.artifact}), then write a summary to \`${epicRoot}/$ARGUMENTS/artifacts/${phase.id.toUpperCase()}-SUMMARY.md\` so the AIDLC validator has a file to check.`;
+    ? `3. Write your output to \`${epicRoot}/$ARGUMENTS/artifacts/${phase.artifact}\`. The EDLC validator checks for this file when the step is marked done.`
+    : `3. Complete the work (${phase.artifact}), then write a summary to \`${epicRoot}/$ARGUMENTS/artifacts/${phase.id.toUpperCase()}-SUMMARY.md\` so the EDLC validator has a file to check.`;
 
   return `---
 description: ${phase.description}
@@ -594,7 +594,7 @@ The user invoked you with epic id \`$ARGUMENTS\`.
    - Check \`history\` entries for rejection reasons and context.
 2. Read \`${epicRoot}/$ARGUMENTS/inputs.json\` for capability inputs (Jira ticket, Figma URL, files glob, GitHub repo, etc.).
 ${artifactInstruction}
-4. When finished, summarize what you produced and tell the user to click **"Mark step done"** in the AIDLC panel to advance the pipeline.
+4. When finished, summarize what you produced and tell the user to click **"Mark step done"** in the EDLC panel to advance the pipeline.
 `;
 }
 

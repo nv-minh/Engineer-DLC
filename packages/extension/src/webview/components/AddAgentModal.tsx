@@ -35,7 +35,7 @@ export interface AddAgentDraft {
   model: string;
   description?: string;
   capabilities?: string[];
-  /** aidlc only — file-based agents don't have an env concept. */
+  /** edlc only — file-based agents don't have an env concept. */
   env?: Record<string, string>;
 }
 
@@ -91,7 +91,7 @@ export function AddAgentModal({
 
   // Match the Skills tab — project + global only, split into tabs so the
   // user picks from one origin at a time instead of scrolling a flat list.
-  // AIDLC-scope skills (workspace.yaml-declared pipeline phases) are an
+  // EDLC-scope skills (workspace.yaml-declared pipeline phases) are an
   // internal binding, not user-pickable reusable assets.
   const projectSkills = useMemo(
     () => skills.filter((s) => s.scope === 'project'),
@@ -145,9 +145,9 @@ export function AddAgentModal({
     };
     if (description.trim()) { draft.description = description.trim(); }
     if (capabilities.length > 0) { draft.capabilities = capabilities; }
-    // Env vars only apply to AIDLC scope (workspace.yaml-managed).
+    // Env vars only apply to EDLC scope (workspace.yaml-managed).
     // File-based project/global agents have no env concept.
-    if (scope === 'aidlc' && Object.keys(cleanedEnv).length > 0) {
+    if (scope === 'edlc' && Object.keys(cleanedEnv).length > 0) {
       draft.env = cleanedEnv;
     }
     onSubmit(draft);
@@ -431,11 +431,11 @@ export function AddAgentModal({
           </div>
         </div>
 
-        {scope === 'aidlc' && (
+        {scope === 'edlc' && (
           <div>
             <div className="mb-1 flex items-baseline justify-between gap-2">
               <span className="text-[10.5px] font-bold uppercase tracking-wider text-muted-foreground">
-                Env vars <span className="font-normal normal-case tracking-normal text-muted-foreground/80">(optional — AIDLC only)</span>
+                Env vars <span className="font-normal normal-case tracking-normal text-muted-foreground/80">(optional — EDLC only)</span>
               </span>
               <button
                 type="button"

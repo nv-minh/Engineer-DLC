@@ -2,12 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run AIDLC Flow Extension",
+      "name": "Run EDLC Flow Extension",
       "type": "extensionHost",
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/packages/extension",
-        "--disable-extension=hueanmy.aidlc",
+        "--disable-extension=nv-minh.edlc",
         "${workspaceFolder}"
       ],
       "outFiles": [

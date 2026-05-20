@@ -2,7 +2,7 @@
  * Filesystem persistence for {@link RunState}.
  *
  * Layout:
- *   <workspace>/.aidlc/runs/<runId>.json
+ *   <workspace>/.edlc/runs/<runId>.json
  *
  * The store is intentionally dumb — it reads/writes JSON, validates the
  * schemaVersion, and that's it. All state-machine logic lives in
@@ -14,7 +14,7 @@ import * as path from 'path';
 
 import type { RunState } from './RunState';
 
-const RUNS_DIR = path.join('.aidlc', 'runs');
+const RUNS_DIR = path.join('.edlc', 'runs');
 
 /**
  * Filesystem-safe id check — same rules as preset ids: lowercase letters,

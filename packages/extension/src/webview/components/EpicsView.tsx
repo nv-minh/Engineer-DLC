@@ -52,7 +52,7 @@ export function EpicsView({ state }: { state: WorkspaceState }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">AIDLC Epics</h1>
+          <h1 className="text-xl font-bold text-foreground">EDLC Epics</h1>
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
             <span>Workflow runs</span>
             <span>·</span>

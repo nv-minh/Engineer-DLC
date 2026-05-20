@@ -2,8 +2,8 @@
  * Asset discovery — scans 3 scopes for skills + agents and returns a
  * unified catalog the UI can display.
  *
- *   - aidlc    → `<workspace>/.aidlc/skills/`, `<workspace>/.aidlc/agents/`
- *                Workspace-local AIDLC framework assets. Skills are also
+ *   - edlc    → `<workspace>/.edlc/skills/`, `<workspace>/.edlc/agents/`
+ *                Workspace-local EDLC framework assets. Skills are also
  *                declared in workspace.yaml; agents may or may not be.
  *
  *   - project  → `<workspace>/.claude/skills/`, `<workspace>/.claude/agents/`
@@ -16,7 +16,7 @@
  *
  * When an `id` exists in more than one scope, precedence is:
  *
- *     project > aidlc > global
+ *     project > edlc > global
  *
  * The lower-priority entry is still returned in the catalog with
  * `overriddenBy` populated so the UI can render an "overridden" badge.
@@ -30,7 +30,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-export type AssetScope = 'project' | 'aidlc' | 'global';
+export type AssetScope = 'project' | 'edlc' | 'global';
 export type AssetKind = 'skill' | 'agent';
 
 export interface DiscoveredAsset {
@@ -52,9 +52,9 @@ export interface DiscoveryResult {
 
 /**
  * Order matters — first match in this list wins. Keep aligned with the
- * docstring at the top of the file (project > aidlc > global).
+ * docstring at the top of the file (project > edlc > global).
  */
-const SCOPE_PRECEDENCE: AssetScope[] = ['project', 'aidlc', 'global'];
+const SCOPE_PRECEDENCE: AssetScope[] = ['project', 'edlc', 'global'];
 
 interface ScopePaths {
   skills: string;
@@ -72,10 +72,10 @@ export function scopePaths(
   homeDir: string = os.homedir(),
 ): ScopePaths {
   switch (scope) {
-    case 'aidlc':
+    case 'edlc':
       return {
-        skills: path.join(workspaceRoot, '.aidlc', 'skills'),
-        agents: path.join(workspaceRoot, '.aidlc', 'agents'),
+        skills: path.join(workspaceRoot, '.edlc', 'skills'),
+        agents: path.join(workspaceRoot, '.edlc', 'agents'),
       };
     case 'project':
       return {

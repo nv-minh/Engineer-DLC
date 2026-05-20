@@ -19,17 +19,17 @@ import * as path from 'path';
 import * as os from 'os';
 import * as readline from 'readline';
 
-import type { RunState, StepRecord } from '@aidlc/core';
+import type { RunState, StepRecord } from '@edlc/core';
 
 import { modelPrice } from './tokenPricing';
 
 /**
- * Read a synthetic `.aidlc/runs/<runId>.usage.json` sidecar if present.
+ * Read a synthetic `.edlc/runs/<runId>.usage.json` sidecar if present.
  * Used by the demo seeder to surface plausible numbers without polluting
  * `~/.claude/projects`. Returns null on missing/malformed input.
  */
 function readUsageSidecar(workspaceRoot: string, runId: string): EpicUsage | null {
-  const file = path.join(workspaceRoot, '.aidlc', 'runs', `${runId}.usage.json`);
+  const file = path.join(workspaceRoot, '.edlc', 'runs', `${runId}.usage.json`);
   if (!fs.existsSync(file)) return null;
   try {
     const parsed = JSON.parse(fs.readFileSync(file, 'utf8')) as Partial<EpicUsage>;
@@ -230,7 +230,7 @@ export async function computeWorkspaceEpicUsage(
 
   const normalized = path.resolve(workspaceRoot);
 
-  // Sidecar pre-pass: when `.aidlc/runs/<id>.usage.json` exists for a run
+  // Sidecar pre-pass: when `.edlc/runs/<id>.usage.json` exists for a run
   // (written by demo seeders, etc.) use it verbatim and skip the jsonl
   // walk for that run. Lets demo epics show plausible numbers without
   // requiring real Claude history matching the demo's cwd + windows.

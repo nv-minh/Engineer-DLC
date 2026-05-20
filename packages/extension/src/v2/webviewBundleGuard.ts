@@ -27,7 +27,7 @@ export function missingBundleHtml(
   content="default-src 'none';
            style-src ${cspSource} 'unsafe-inline';
            script-src 'nonce-${nonce}';">
-<title>AIDLC — webview bundle missing</title>
+<title>EDLC — webview bundle missing</title>
 <style nonce="${nonce}">
   body { font-family: var(--vscode-font-family); padding: 24px; color: var(--vscode-foreground); line-height: 1.5; }
   h1 { font-size: 1.05rem; margin: 0 0 12px; }
@@ -37,12 +37,12 @@ export function missingBundleHtml(
 </style>
 </head>
 <body>
-<h1>AIDLC webview bundle missing</h1>
+<h1>EDLC webview bundle missing</h1>
 <p>The compiled bundle <code>out/webviews/${bundleName}</code> wasn't found, so the React UI can't mount.</p>
 <p>Rebuild it from the repo root with one of:</p>
 <ul>
-  <li><code>pnpm --filter aidlc bundle:webviews</code> — one-shot Vite build</li>
-  <li><code>pnpm --filter aidlc watch</code> — tsc + Vite watch in parallel (recommended for dev)</li>
+  <li><code>pnpm --filter edlc bundle:webviews</code> — one-shot Vite build</li>
+  <li><code>pnpm --filter edlc watch</code> — tsc + Vite watch in parallel (recommended for dev)</li>
 </ul>
 <p class="hint">This typically happens after <code>pnpm clean:out</code> or when only <code>tsc</code> ran. Reload the VS Code window once the rebuild finishes.</p>
 </body>

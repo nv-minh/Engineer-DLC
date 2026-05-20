@@ -30,10 +30,10 @@ import { isAlreadyRegistered, registerMcpServer } from './mcpRegister';
 import { ensureClaudeMdHint } from './claudeMdHint';
 import { AstGraphReportWebview } from './reportWebview';
 
-const SETTING_NAMESPACE = 'aidlc.astGraph';
-const OPEN_REPORT_CMD = 'aidlc.astGraph.openReport';
-const RESCAN_CMD = 'aidlc.astGraph.rescan';
-const REREGISTER_CMD = 'aidlc.astGraph.reregisterMcp';
+const SETTING_NAMESPACE = 'edlc.astGraph';
+const OPEN_REPORT_CMD = 'edlc.astGraph.openReport';
+const RESCAN_CMD = 'edlc.astGraph.rescan';
+const REREGISTER_CMD = 'edlc.astGraph.reregisterMcp';
 
 interface FolderState {
   folder: vscode.WorkspaceFolder;
@@ -49,7 +49,7 @@ export function registerAstGraph(
 ): void {
   const cfg = () => vscode.workspace.getConfiguration(SETTING_NAMESPACE);
   if (!cfg().get<boolean>('enabled', true)) {
-    output.appendLine('AST graph: disabled via aidlc.astGraph.enabled.');
+    output.appendLine('AST graph: disabled via edlc.astGraph.enabled.');
     return;
   }
 

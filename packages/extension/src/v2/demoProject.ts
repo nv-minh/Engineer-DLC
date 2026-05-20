@@ -1,12 +1,12 @@
 /**
- * `aidlc.loadDemoProject` — scaffolds a self-contained demo workspace at a
- * known path (`~/aidlc-demo-project`) and opens it in a new VS Code window.
+ * `edlc.loadDemoProject` — scaffolds a self-contained demo workspace at a
+ * known path (`~/edlc-demo-project`) and opens it in a new VS Code window.
  *
  * Seeds:
- *   - .aidlc/workspace.yaml         (6 agents + demo-pipeline w/ all gate types)
- *   - .aidlc/skills/hello-skill.md
- *   - .aidlc/validators/demo-validator.js
- *   - .aidlc/runs/<id>.json × 5     (one per gate state)
+ *   - .edlc/workspace.yaml         (6 agents + demo-pipeline w/ all gate types)
+ *   - .edlc/skills/hello-skill.md
+ *   - .edlc/validators/demo-validator.js
+ *   - .edlc/runs/<id>.json × 5     (one per gate state)
  *   - docs/epics/DEMO-001..006/     (6 epics, each parked at a different gate)
  *
  * Why a fixed dir: the demo overwrites real files (workspace.yaml, run
@@ -20,7 +20,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-const DEMO_DIR_NAME = 'aidlc-demo-project';
+const DEMO_DIR_NAME = 'edlc-demo-project';
 
 /** Pipeline shape used by the seeded demo-pipeline. Keep in sync with the YAML below. */
 const STEPS = [
@@ -52,7 +52,7 @@ export async function loadDemoProjectCommand(
       action = mode;
     } else {
       const choice = await vscode.window.showWarningMessage(
-        `Demo project already exists at ~/${DEMO_DIR_NAME}. Re-seed (overwrites .aidlc/ + docs/epics/) or just open it as-is?`,
+        `Demo project already exists at ~/${DEMO_DIR_NAME}. Re-seed (overwrites .edlc/ + docs/epics/) or just open it as-is?`,
         { modal: false },
         'Re-seed and open',
         'Open as-is',
@@ -88,27 +88,27 @@ export async function loadDemoProjectCommand(
  * (e.g. their own scratch notes in the demo folder) untouched.
  */
 function wipeDemoData(root: string): void {
-  for (const sub of ['.aidlc', 'docs/epics', '.claude/commands']) {
+  for (const sub of ['.edlc', 'docs/epics', '.claude/commands']) {
     const p = path.join(root, sub);
     if (fs.existsSync(p)) { fs.rmSync(p, { recursive: true, force: true }); }
   }
 }
 
 function seedDemo(root: string): void {
-  // .aidlc/ scaffolding
-  writeFile(path.join(root, '.aidlc', 'workspace.yaml'), WORKSPACE_YAML);
-  writeFile(path.join(root, '.aidlc', 'skills', 'hello-skill.md'), HELLO_SKILL);
-  writeFile(path.join(root, '.aidlc', 'skills', 'demo-plan-skill.md'), PLAN_SKILL);
-  writeFile(path.join(root, '.aidlc', 'skills', 'demo-design-skill.md'), DESIGN_SKILL);
-  writeFile(path.join(root, '.aidlc', 'skills', 'demo-implement-skill.md'), IMPLEMENT_SKILL);
-  writeFile(path.join(root, '.aidlc', 'skills', 'demo-review-skill.md'), REVIEW_SKILL);
-  writeFile(path.join(root, '.aidlc', 'skills', 'demo-release-skill.md'), RELEASE_SKILL);
-  writeFile(path.join(root, '.aidlc', 'validators', 'demo-validator.js'), DEMO_VALIDATOR);
+  // .edlc/ scaffolding
+  writeFile(path.join(root, '.edlc', 'workspace.yaml'), WORKSPACE_YAML);
+  writeFile(path.join(root, '.edlc', 'skills', 'hello-skill.md'), HELLO_SKILL);
+  writeFile(path.join(root, '.edlc', 'skills', 'demo-plan-skill.md'), PLAN_SKILL);
+  writeFile(path.join(root, '.edlc', 'skills', 'demo-design-skill.md'), DESIGN_SKILL);
+  writeFile(path.join(root, '.edlc', 'skills', 'demo-implement-skill.md'), IMPLEMENT_SKILL);
+  writeFile(path.join(root, '.edlc', 'skills', 'demo-review-skill.md'), REVIEW_SKILL);
+  writeFile(path.join(root, '.edlc', 'skills', 'demo-release-skill.md'), RELEASE_SKILL);
+  writeFile(path.join(root, '.edlc', 'validators', 'demo-validator.js'), DEMO_VALIDATOR);
 
   // Claude Code reads slash commands from `.claude/commands/<name>.md`, NOT
-  // from workspace.yaml. Mirror each AIDLC agent there so `/demo-plan ARG`
+  // from workspace.yaml. Mirror each EDLC agent there so `/demo-plan ARG`
   // etc. actually work in the Claude CLI for this demo project. Each
-  // command inlines the skill body + AIDLC-specific task instructions
+  // command inlines the skill body + EDLC-specific task instructions
   // (read state.json / inputs.json, address carried feedback, write the
   // expected artifact, tell the user to mark step done).
   writeFile(
@@ -164,7 +164,7 @@ function seedDemo(root: string): void {
   writeFile(
     path.join(root, '.claude', 'commands', 'hello.md'),
     `---
-description: Greet the user and confirm the AIDLC demo runner is wired up
+description: Greet the user and confirm the EDLC demo runner is wired up
 ---
 
 ${HELLO_SKILL}
@@ -207,7 +207,7 @@ Reply with a friendly greeting and confirm the demo project is wired correctly. 
     autoReviewVerdict: {
       decision: 'pass',
       reason: 'All produced artifacts present; no policy violations detected by demo-validator.',
-      runner: '.aidlc/validators/demo-validator.js',
+      runner: '.edlc/validators/demo-validator.js',
     },
     createdHoursAgo: 49,
   });
@@ -227,7 +227,7 @@ Reply with a friendly greeting and confirm the demo project is wired correctly. 
     autoReviewVerdict: {
       decision: 'pass',
       reason: 'Validator pass — but human reviewer flagged missing test coverage.',
-      runner: '.aidlc/validators/demo-validator.js',
+      runner: '.edlc/validators/demo-validator.js',
     },
     createdHoursAgo: 73,
   });
@@ -243,7 +243,7 @@ Reply with a friendly greeting and confirm the demo project is wired correctly. 
   // Legacy: state.json done but NO RunState file → "Start pipeline run" button
   seedEpic(root, 'DEMO-006-LEGACY-NO-RUNSTATE', {
     title: 'Demo: Legacy epic (no run state)',
-    description: 'state.json shows all steps done but there is no .aidlc/runs/<id>.json — surfaces the "Start pipeline run" backfill button.',
+    description: 'state.json shows all steps done but there is no .edlc/runs/<id>.json — surfaces the "Start pipeline run" backfill button.',
     doneCount: STEPS.length,
     createdHoursAgo: 121,
   });
@@ -283,7 +283,7 @@ Reply with a friendly greeting and confirm the demo project is wired correctly. 
     autoReviewVerdictAtCurrent: {
       decision: 'pass',
       reason: 'All produced artifacts present; coverage hooks satisfied.',
-      runner: '.aidlc/validators/demo-validator.js',
+      runner: '.edlc/validators/demo-validator.js',
     },
   });
 
@@ -389,7 +389,7 @@ interface SeedRichEpicOpts {
  * existing simple seeders intact for the basic gate-state demos.
  */
 function seedRichEpic(root: string, epicId: string, opts: SeedRichEpicOpts): void {
-  const validatorPath = '.aidlc/validators/demo-validator.js';
+  const validatorPath = '.edlc/validators/demo-validator.js';
   const buildHistory = (idx: number): Record<string, unknown>[] =>
     (opts.histories[idx] ?? []).map((h) => {
       const at = isoOffset(-h.hoursAgo);
@@ -473,7 +473,7 @@ function seedRichEpic(root: string, epicId: string, opts: SeedRichEpicOpts): voi
     status: opts.completed ? 'completed' : 'running',
     steps,
   };
-  writeJson(path.join(root, '.aidlc', 'runs', `${epicId}.json`), runState);
+  writeJson(path.join(root, '.edlc', 'runs', `${epicId}.json`), runState);
 
   // Synthetic token-usage sidecar — lets the demo epic render the ⚡
   // badge + per-step + per-history breakdown without requiring real
@@ -482,12 +482,12 @@ function seedRichEpic(root: string, epicId: string, opts: SeedRichEpicOpts): voi
   // the UI; the EpicTokenAttribution module reads this sidecar
   // verbatim when present (`<runId>.usage.json` next to `<runId>.json`).
   writeJson(
-    path.join(root, '.aidlc', 'runs', `${epicId}.usage.json`),
+    path.join(root, '.edlc', 'runs', `${epicId}.usage.json`),
     buildRichEpicSyntheticUsage(steps),
   );
 
   // Mirror into state.json so a teammate who only pulls the repo (and
-  // therefore lacks the gitignored .aidlc/runs/) can still read the
+  // therefore lacks the gitignored .edlc/runs/) can still read the
   // history. Mirrors the shape produced by `mirrorRunStateToEpic`.
   const stateStepStates = steps.map((s) => ({
     agent: s.agent,
@@ -522,7 +522,7 @@ function seedRichEpic(root: string, epicId: string, opts: SeedRichEpicOpts): voi
   writeJson(path.join(epicDir, 'inputs.json'), {
     jira: `DEMO-${epicId.split('-')[1]}`,
     files: 'src/**/*.ts',
-    github: 'aidlc-io/aidlc',
+    github: 'nv-minh/edlc',
   });
 
   // Artifacts: write one for every step that has been produced.
@@ -647,9 +647,9 @@ function buildRichEpicSyntheticUsage(
  * Build a Claude Code slash-command markdown file from one of the demo
  * agents. The result lives at `.claude/commands/<name>.md` and is what
  * actually makes `/demo-plan EPIC-ID` work in the Claude REPL — Claude
- * Code reads from `.claude/commands/`, not from `.aidlc/workspace.yaml`.
+ * Code reads from `.claude/commands/`, not from `.edlc/workspace.yaml`.
  *
- * The body inlines the skill prompt + AIDLC-specific task wiring so the
+ * The body inlines the skill prompt + EDLC-specific task wiring so the
  * agent knows to:
  *   - read the epic's state.json / inputs.json
  *   - honour any carried feedback from a prior reject (the run's history)
@@ -670,7 +670,7 @@ function claudeCommand(opts: {
 description: ${opts.description}
 ---
 
-You are the **${opts.agentLabel}** agent for the AIDLC demo pipeline.
+You are the **${opts.agentLabel}** agent for the EDLC demo pipeline.
 
 ## Skill
 
@@ -693,11 +693,11 @@ The user invoked you with epic id \`$ARGUMENTS\`.
    user-supplied inputs for this run.
 
 3. Produce \`docs/epics/$ARGUMENTS/artifacts/${opts.artifact}\`. The
-   AIDLC validator checks for this file's existence when the user
+   EDLC validator checks for this file's existence when the user
    marks the step done.
 
 4. When finished, summarize what you produced and tell the user to
-   click "Mark step done" in the AIDLC sidebar to advance the pipeline.
+   click "Mark step done" in the EDLC sidebar to advance the pipeline.
 `;
 }
 
@@ -775,7 +775,7 @@ function seedEpic(root: string, epicId: string, opts: SeedEpicOpts): void {
   writeJson(path.join(epicDir, 'inputs.json'), {
     jira: `DEMO-${epicId.split('-')[1]}`,
     files: 'src/**/*.ts',
-    github: 'aidlc-io/aidlc',
+    github: 'nv-minh/edlc',
   });
 
   for (let i = 0; i < opts.doneCount; i++) {
@@ -841,13 +841,13 @@ function seedRunState(root: string, epicId: string, opts: SeedRunStateOpts): voi
     steps,
   };
 
-  writeJson(path.join(root, '.aidlc', 'runs', `${epicId}.json`), runState);
+  writeJson(path.join(root, '.edlc', 'runs', `${epicId}.json`), runState);
 
   // Synthetic usage sidecar so the simple gate-state demos (DEMO-001..005)
   // also light up the ⚡ badge. Each step uses its base "typical Opus 4.x"
   // cost; pending steps contribute zero (no work done yet).
   writeJson(
-    path.join(root, '.aidlc', 'runs', `${epicId}.usage.json`),
+    path.join(root, '.edlc', 'runs', `${epicId}.usage.json`),
     buildSimpleSyntheticUsage(steps),
   );
 }
@@ -1115,7 +1115,7 @@ module.exports = async function demoValidator(_ctx) {
 `;
 
 const WORKSPACE_YAML = `version: "1.0"
-name: "AIDLC Demo Project"
+name: "EDLC Demo Project"
 
 agents:
   - id: hello
@@ -1175,17 +1175,17 @@ agents:
 
 skills:
   - id: hello-skill
-    path: ./.aidlc/skills/hello-skill.md
+    path: ./.edlc/skills/hello-skill.md
   - id: demo-plan-skill
-    path: ./.aidlc/skills/demo-plan-skill.md
+    path: ./.edlc/skills/demo-plan-skill.md
   - id: demo-design-skill
-    path: ./.aidlc/skills/demo-design-skill.md
+    path: ./.edlc/skills/demo-design-skill.md
   - id: demo-implement-skill
-    path: ./.aidlc/skills/demo-implement-skill.md
+    path: ./.edlc/skills/demo-implement-skill.md
   - id: demo-review-skill
-    path: ./.aidlc/skills/demo-review-skill.md
+    path: ./.edlc/skills/demo-review-skill.md
   - id: demo-release-skill
-    path: ./.aidlc/skills/demo-release-skill.md
+    path: ./.edlc/skills/demo-release-skill.md
 
 environment: {}
 
@@ -1221,7 +1221,7 @@ pipelines:
         produces:
           - "docs/epics/{epic}/artifacts/CHANGES.md"
         auto_review: true
-        auto_review_runner: ./.aidlc/validators/demo-validator.js
+        auto_review_runner: ./.edlc/validators/demo-validator.js
         human_review: true
       - agent: demo-review
         requires:
@@ -1229,7 +1229,7 @@ pipelines:
         produces:
           - "docs/epics/{epic}/artifacts/REVIEW.md"
         auto_review: true
-        auto_review_runner: ./.aidlc/validators/demo-validator.js
+        auto_review_runner: ./.edlc/validators/demo-validator.js
       - agent: demo-release
         requires:
           - "docs/epics/{epic}/artifacts/REVIEW.md"

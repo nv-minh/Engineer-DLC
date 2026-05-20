@@ -1,5 +1,5 @@
 /**
- * `aidlc.insertDemoEpic` — drops a fake EPIC-100 into the project so the
+ * `edlc.insertDemoEpic` — drops a fake EPIC-100 into the project so the
  * user can see what the Epics panel renders before any real run is wired.
  *
  * Picks the first pipeline (or first single agent) declared in
@@ -14,7 +14,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { stepAgentId } from '@aidlc/core';
+import { stepAgentId } from '@edlc/core';
 
 import { readYaml, type YamlDocument } from './yamlIO';
 
@@ -22,7 +22,7 @@ const DEMO_INPUTS_BY_CAPABILITY: Record<string, string> = {
   'jira': 'PROJ-100',
   'figma': 'https://www.figma.com/file/abcDEF12345/Profile-Page',
   'core-business': 'docs/core',
-  'github': 'aidlc-io/aidlc',
+  'github': 'nv-minh/edlc',
   'slack': '#engineering',
   'files': 'src/**/*.ts',
   'web': 'https://docs.example.com',
@@ -31,14 +31,14 @@ const DEMO_INPUTS_BY_CAPABILITY: Record<string, string> = {
 export async function insertDemoEpicCommand(): Promise<void> {
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    void vscode.window.showWarningMessage('AIDLC: Open a project first.');
+    void vscode.window.showWarningMessage('EDLC: Open a project first.');
     return;
   }
 
   const doc = readYaml(root);
   if (!doc) {
     void vscode.window.showWarningMessage(
-      'AIDLC: No workspace.yaml — load a template first (e.g. SDLC Pipeline).',
+      'EDLC: No workspace.yaml — load a template first (e.g. SDLC Pipeline).',
     );
     return;
   }
@@ -46,7 +46,7 @@ export async function insertDemoEpicCommand(): Promise<void> {
   const target = pickDemoTarget(doc);
   if (!target) {
     void vscode.window.showWarningMessage(
-      'AIDLC: No pipelines or agents in workspace.yaml — nothing to demo.',
+      'EDLC: No pipelines or agents in workspace.yaml — nothing to demo.',
     );
     return;
   }
@@ -82,7 +82,7 @@ export async function insertDemoEpicCommand(): Promise<void> {
   const state = {
     id: 'EPIC-100',
     title: 'Add user profile page (DEMO)',
-    description: 'Synthetic data — populated by AIDLC: Insert Demo Epic so you can see how progress renders.',
+    description: 'Synthetic data — populated by EDLC: Insert Demo Epic so you can see how progress renders.',
     pipeline: target.kind === 'pipeline' ? target.id : null,
     agent: target.kind === 'agent' ? target.id : null,
     agents: target.agents,
@@ -115,7 +115,7 @@ export async function insertDemoEpicCommand(): Promise<void> {
     )
     .then((c) => {
       if (c === 'Open Epics Panel') {
-        void vscode.commands.executeCommand('aidlc.openEpicsList');
+        void vscode.commands.executeCommand('edlc.openEpicsList');
       }
     });
 }
@@ -126,7 +126,7 @@ function stubArtifactContent(agentId: string, agent: Record<string, unknown>): s
   const outputs = typeof agent.outputs === 'string' ? agent.outputs : '';
   return `# ${name} artifact (DEMO)
 
-> Placeholder produced by **AIDLC: Insert Demo Epic** so the Epics panel has
+> Placeholder produced by **EDLC: Insert Demo Epic** so the Epics panel has
 > something to open. Replace with the real output when an actual run lands here.
 
 **Phase:** ${name} (${agentId})

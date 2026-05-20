@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { WORKSPACE_DIR } from '@aidlc/core';
+import { WORKSPACE_DIR } from '@edlc/core';
 import { readYaml, requireYaml, writeYaml, YamlDocument } from '../yamlIO';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import { SKILL_TEMPLATES } from '../skillTemplates';
@@ -112,7 +112,7 @@ const BUILTIN_PRESETS: BuiltinPreset[] = [
   },
 ];
 
-// ── User presets (stored in .aidlc/presets/*.json) ────────────────────────────
+// ── User presets (stored in .edlc/presets/*.json) ────────────────────────────
 
 const PRESETS_DIR = path.join(WORKSPACE_DIR, 'presets');
 
@@ -208,7 +208,7 @@ export function registerPreset(program: Command): void {
       if (!doc) {
         doc = {
           version: '1.0',
-          name: 'AIDLC Workspace',
+          name: 'EDLC Workspace',
           agents: [], skills: [], environment: {},
           slash_commands: [], pipelines: [],
         };
@@ -224,7 +224,7 @@ export function registerPreset(program: Command): void {
         const p = updated.pipelines.length;
         console.log(chalk.green('✔') + ` Applied preset ${chalk.bold(name)}`);
         console.log(chalk.dim(`  ${a} agent${a !== 1 ? 's' : ''}, ${s} skill${s !== 1 ? 's' : ''}, ${p} pipeline${p !== 1 ? 's' : ''}`));
-        console.log(chalk.dim('  Run: aidlc validate && aidlc list'));
+        console.log(chalk.dim('  Run: edlc validate && edlc list'));
         return;
       }
 
@@ -244,7 +244,7 @@ export function registerPreset(program: Command): void {
       }
 
       console.error(chalk.red(`Preset "${name}" not found.`));
-      console.error(chalk.dim('Run: aidlc preset list'));
+      console.error(chalk.dim('Run: edlc preset list'));
       process.exit(1);
     });
 

@@ -1,6 +1,6 @@
-# Getting Started with AIDLC
+# Getting Started with EDLC
 
-Your `.aidlc/workspace.yaml` is ready. This page walks you through what you
+Your `.edlc/workspace.yaml` is ready. This page walks you through what you
 just got, how to run it, and how to customize it.
 
 ---
@@ -32,7 +32,7 @@ The Builder panel surfaces three tabs:
 
 ## 2. Start your first epic
 
-Click **Start Epic** in the AIDLC sidebar.
+Click **Start Epic** in the EDLC sidebar.
 
 1. **Pick the pipeline** (e.g. `sdlc-parallel-full`).
 2. **Epic id** — pre-filled from the next sequential id; rename if you like.
@@ -69,10 +69,10 @@ plain markdown file you can edit:
 
 | Asset | Location | What to edit |
 |-------|----------|--------------|
-| Agent persona | `~/.claude/agents/aidlc-<id>.md` | The role description, tone, constraints |
-| Skill | `~/.claude/skills/aidlc-<id>.md` | Step-by-step instructions for the slash command |
+| Agent persona | `~/.claude/agents/edlc-<id>.md` | The role description, tone, constraints |
+| Skill | `~/.claude/skills/edlc-<id>.md` | Step-by-step instructions for the slash command |
 | Slash command | `.claude/commands/<id>.md` | The full prompt Claude sees when you run `/<id>` |
-| Artifact template | `.aidlc/aidlc-templates/<pipeline>/<artifact>.md` | The scaffold dropped into each epic |
+| Artifact template | `.edlc/edlc-templates/<pipeline>/<artifact>.md` | The scaffold dropped into each epic |
 
 Open any of these in your editor and the change takes effect on the next run.
 The Agents and Skills tabs in the Builder are click-to-edit links to these
@@ -117,7 +117,7 @@ set render in the same column.
 
 1. In the **Agents** tab, click **`+ Add Agent`**.
 2. Pick the scope (`Project` = `.claude/agents/<id>.md`, `Global` =
-   `~/.claude/agents/aidlc-<id>.md`).
+   `~/.claude/agents/edlc-<id>.md`).
 3. Pick the skills it should use.
 4. Edit the persona markdown when it opens.
 
@@ -131,10 +131,10 @@ to skip the blank page.
 
 From the epic detail panel:
 
-- **Run with Claude** → launches the slash command in the AIDLC · Claude
+- **Run with Claude** → launches the slash command in the EDLC · Claude
   terminal. If carried feedback exists (cascade reject, manual rerun),
   the modal opens so you can review the feedback before launching.
-- **Mark step done** → tells AIDLC the agent finished. Validates that the
+- **Mark step done** → tells EDLC the agent finished. Validates that the
   step's `produces` paths exist, then advances the DAG.
 - **Approve / Reject** (after `human_review`) → either advances or rewinds.
   Rewind to any upstream step; downstream steps reset to pending.
@@ -150,10 +150,10 @@ From the epic detail panel:
 - **Workflow lost its DAG?** Open `workspace.yaml` and check the
   `depends_on` field on each step. The Settings modal preserves edges; the
   + parallel button on a step inflates a linear chain into a DAG.
-- **Want to share a pipeline?** Run **AIDLC: Save Workspace as Template**
+- **Want to share a pipeline?** Run **EDLC: Save Workspace as Template**
   in the command palette — it captures `workspace.yaml` + every referenced
-  skill into a single JSON in `.aidlc/templates/<id>.json`. Commit it and
+  skill into a single JSON in `.edlc/templates/<id>.json`. Commit it and
   teammates get the same flow via **Load Template**.
 
-You can re-open this guide any time via **AIDLC: Open Getting Started Guide**
+You can re-open this guide any time via **EDLC: Open Getting Started Guide**
 in the command palette.

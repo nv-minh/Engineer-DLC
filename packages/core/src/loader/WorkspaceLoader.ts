@@ -27,11 +27,11 @@ import { SkillLoader } from './SkillLoader';
 import { RunnerRegistry } from '../runner/RunnerRegistry';
 
 export const WORKSPACE_FILENAME = 'workspace.yaml';
-export const WORKSPACE_DIR = '.aidlc';
+export const WORKSPACE_DIR = '.edlc';
 
 export class WorkspaceNotFoundError extends Error {
   constructor(public readonly workspaceRoot: string) {
-    super(`No \`.aidlc/${WORKSPACE_FILENAME}\` found under ${workspaceRoot}`);
+    super(`No \`.edlc/${WORKSPACE_FILENAME}\` found under ${workspaceRoot}`);
     this.name = 'WorkspaceNotFoundError';
   }
 }
@@ -48,7 +48,7 @@ export interface LoadedWorkspace {
   config: WorkspaceConfig;
   /** Absolute path to the workspace.yaml file. */
   configPath: string;
-  /** Workspace root (the directory that contains .aidlc/). */
+  /** Workspace root (the directory that contains .edlc/). */
   root: string;
   /** Env resolver pre-wired to the OS environment. */
   envResolver: EnvResolver;
@@ -85,7 +85,7 @@ export class WorkspaceLoader {
    * `LoadedWorkspace` ready to use.
    *
    * Errors:
-   *   - WorkspaceNotFoundError — no .aidlc/workspace.yaml at root
+   *   - WorkspaceNotFoundError — no .edlc/workspace.yaml at root
    *   - WorkspaceParseError    — YAML parse failure
    *   - WorkspaceValidationError — schema mismatch (Zod issues)
    */

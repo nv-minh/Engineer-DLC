@@ -203,7 +203,7 @@ export function EpicCard({ epic, agentMeta, slashCommandsByAgent }: Props) {
               slashCommand={
                 // Built-in pipelines split phase ↔ persona: the slash
                 // command name matches the step's phase id (e.g.
-                // `/plan`), not the persona agent (`/aidlc-po`). Fall
+                // `/plan`), not the persona agent (`/edlc-po`). Fall
                 // back to the workspace.yaml slash_commands table when
                 // the step doesn't carry a name (legacy / user-defined).
                 focused.stepName

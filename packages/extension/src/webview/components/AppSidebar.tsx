@@ -137,7 +137,7 @@ export function AppSidebar({ state }: { state: SidebarState | null }) {
         <div className="flex items-center gap-2 min-w-0">
           <BrandIcon />
           <div className="min-w-0">
-            <h2 className="text-[11px] font-bold tracking-widest uppercase">AIDLC</h2>
+            <h2 className="text-[11px] font-bold tracking-widest uppercase">EDLC</h2>
             <p className="truncate text-[10px] text-muted-foreground">Agent workflow runner</p>
           </div>
         </div>
@@ -242,7 +242,7 @@ function BrandIcon() {
     return (
       <img
         src={uri}
-        alt="AIDLC"
+        alt="EDLC"
         className="h-7 w-7 shrink-0 rounded-md object-cover shadow-md shadow-primary/20"
       />
     );
@@ -692,7 +692,7 @@ function WorkflowsSection({
           confirmLabel="Overwrite & apply"
           message={
             <>
-              This project already has <span className="font-mono">.aidlc/workspace.yaml</span>.
+              This project already has <span className="font-mono">.edlc/workspace.yaml</span>.
               Overwrite with template <span className="font-mono">{pendingApply.id}</span>?
             </>
           }

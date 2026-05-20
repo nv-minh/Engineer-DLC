@@ -1,6 +1,6 @@
 /**
- * Webview-side type definitions mirroring the host's @aidlc/core shapes.
- * Copied (not imported) because @aidlc/core targets Node and is bundled
+ * Webview-side type definitions mirroring the host's @edlc/core shapes.
+ * Copied (not imported) because @edlc/core targets Node and is bundled
  * into the host. The types are stable enough to keep in sync manually.
  */
 
@@ -184,7 +184,7 @@ export interface SidebarState {
   pipelines: PipelineRef[];
   /** All existing run ids (any status) — used by the modal to validate uniqueness. */
   runIds: string[];
-  /** True when ~/aidlc-demo-project already exists. The "Load Demo Project"
+  /** True when ~/edlc-demo-project already exists. The "Load Demo Project"
    * button uses this to pop an inline modal asking re-seed vs open-as-is
    * instead of letting the host show a VS Code notification. */
   demoProjectExists: boolean;
@@ -195,7 +195,7 @@ export interface SidebarState {
   mcpError: string | null;
 }
 
-export type AssetScope = 'project' | 'aidlc' | 'global';
+export type AssetScope = 'project' | 'edlc' | 'global';
 
 export interface AgentSummary {
   id: string;
@@ -405,8 +405,8 @@ export type EpicFilter = 'all' | 'in_progress' | 'pending' | 'done' | 'failed';
 
 declare global {
   interface Window {
-    __AIDLC_INITIAL_STATE__?: SidebarState | WorkspaceState;
-    __AIDLC_INITIAL_THEME__?: ThemeMode;
+    __EDLC_INITIAL_STATE__?: SidebarState | WorkspaceState;
+    __EDLC_INITIAL_THEME__?: ThemeMode;
     BRAND_ICON_URI?: string;
     EXTENSION_VERSION?: string;
     acquireVsCodeApi?: () => VsCodeApi;

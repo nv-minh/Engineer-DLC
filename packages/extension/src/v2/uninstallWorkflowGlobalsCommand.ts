@@ -1,8 +1,8 @@
 /**
- * `aidlc.uninstallWorkflowGlobals` — multi-pick UI to remove built-in
+ * `edlc.uninstallWorkflowGlobals` — multi-pick UI to remove built-in
  * workflows' agents + skills from `~/.claude/agents/` and `~/.claude/skills/`.
  *
- * Only files still carrying the AIDLC marker are removed — user-edited or
+ * Only files still carrying the EDLC marker are removed — user-edited or
  * replaced files are preserved.
  *
  * Recommended to run *before* uninstalling the extension since VS Code has
@@ -32,7 +32,7 @@ export async function uninstallWorkflowGlobalsCommand(
   );
   if (installed.length === 0) {
     void vscode.window.showInformationMessage(
-      'AIDLC: no workflow agents / skills installed in ~/.claude/. Nothing to uninstall.',
+      'EDLC: no workflow agents / skills installed in ~/.claude/. Nothing to uninstall.',
     );
     return;
   }
@@ -61,7 +61,7 @@ export async function uninstallWorkflowGlobalsCommand(
     .join(', ');
   const confirm = await vscode.window.showWarningMessage(
     `Remove agent + skill files for: ${names}?\n\n` +
-      'Only files written by the AIDLC extension are removed. Anything you edited or replaced is kept.',
+      'Only files written by the EDLC extension are removed. Anything you edited or replaced is kept.',
     { modal: false },
     'Remove', 'Cancel',
   );
@@ -78,7 +78,7 @@ export async function uninstallWorkflowGlobalsCommand(
     ? ` (skipped ${totalSkipped} user-edited file${totalSkipped === 1 ? '' : 's'})`
     : '';
   void vscode.window.showInformationMessage(
-    `AIDLC: removed ${totalRemoved} file${totalRemoved === 1 ? '' : 's'} for ${names}${skippedNote}.`,
+    `EDLC: removed ${totalRemoved} file${totalRemoved === 1 ? '' : 's'} for ${names}${skippedNote}.`,
   );
   // Refresh the Builder so the Domain dropdown drops the just-removed
   // workflows immediately.

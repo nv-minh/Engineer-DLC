@@ -68,7 +68,7 @@ export function InitWorkflowModal({
 
   return (
     <Modal
-      title="Initialize AIDLC workspace"
+      title="Initialize EDLC workspace"
       subtitle="Pick a starting workflow. You can edit, add, or delete steps afterwards."
       onClose={onClose}
       onSubmit={submit}

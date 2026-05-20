@@ -1,13 +1,13 @@
 {
-  "name": "aidlc",
-  "displayName": "AIDLC",
+  "name": "edlc",
+  "displayName": "EDLC",
   "description": "Drive Claude through any pipeline declared in workspace.yaml — agents, skills, pipelines, and epics with sequential approve/reject/rerun runs, all from VS Code.",
   "version": "1.0.1",
-  "publisher": "hueanmy",
+  "publisher": "nv-minh",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aidlc-io/aidlc"
+    "url": "https://github.com/nv-minh/edlc"
   },
   "icon": "media/icon.png",
   "keywords": [
@@ -30,16 +30,16 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "aidlc",
-          "title": "AIDLC",
+          "id": "edlc",
+          "title": "EDLC",
           "icon": "media/pipeline-icon.svg"
         }
       ]
     },
     "views": {
-      "aidlc": [
+      "edlc": [
         {
-          "id": "aidlcSidebar",
+          "id": "edlcSidebar",
           "name": "Workspace",
           "icon": "media/pipeline-icon.svg",
           "type": "webview"
@@ -48,170 +48,170 @@
     },
     "commands": [
       {
-        "command": "aidlc.openBuilder",
+        "command": "edlc.openBuilder",
         "title": "Open Workspace Builder",
         "icon": "$(layout-panel)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.showWorkspaceConfig",
+        "command": "edlc.showWorkspaceConfig",
         "title": "Show Workspace Config",
         "icon": "$(file-code)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.initWorkspace",
+        "command": "edlc.initWorkspace",
         "title": "Init Sample Workspace",
         "icon": "$(rocket)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.openGettingStarted",
+        "command": "edlc.openGettingStarted",
         "title": "Open Getting Started Guide",
         "icon": "$(book)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.addSkill",
+        "command": "edlc.addSkill",
         "title": "Add Skill (template / paste / upload / blank)",
         "icon": "$(file-code)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.addAgent",
+        "command": "edlc.addAgent",
         "title": "Add Agent",
         "icon": "$(person)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.addPipeline",
+        "command": "edlc.addPipeline",
         "title": "Add Pipeline (chain agents)",
         "icon": "$(list-ordered)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.openClaudeTerminal",
+        "command": "edlc.openClaudeTerminal",
         "title": "Open Claude CLI Terminal",
         "icon": "$(terminal)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.savePreset",
+        "command": "edlc.savePreset",
         "title": "Save Workspace as Template",
         "icon": "$(save)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.applyPreset",
+        "command": "edlc.applyPreset",
         "title": "Load Template",
         "icon": "$(symbol-snippet)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.deletePreset",
+        "command": "edlc.deletePreset",
         "title": "Delete Saved Template",
         "icon": "$(trash)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.installWorkflowGlobals",
+        "command": "edlc.installWorkflowGlobals",
         "title": "Install Workflow Globals (~/.claude/agents + skills)",
         "icon": "$(cloud-download)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.uninstallWorkflowGlobals",
+        "command": "edlc.uninstallWorkflowGlobals",
         "title": "Uninstall Workflow Globals (run before removing extension)",
         "icon": "$(trash)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.migrateEpics",
+        "command": "edlc.migrateEpics",
         "title": "Migrate Epic State Files",
         "icon": "$(sync)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.startEpic",
+        "command": "edlc.startEpic",
         "title": "Start Epic",
         "icon": "$(rocket)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.openEpicsList",
+        "command": "edlc.openEpicsList",
         "title": "Open Epics List",
         "icon": "$(checklist)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.insertDemoEpic",
+        "command": "edlc.insertDemoEpic",
         "title": "Insert Demo Epic (EPIC-100)",
         "icon": "$(beaker)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.loadDemoProject",
+        "command": "edlc.loadDemoProject",
         "title": "Load Demo Project (full pipeline + 6 epics)",
         "icon": "$(beaker)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.showTokenUsage",
+        "command": "edlc.showTokenUsage",
         "title": "Show Claude Token Usage",
         "icon": "$(graph)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.refreshTokenUsage",
+        "command": "edlc.refreshTokenUsage",
         "title": "Refresh Claude Token Usage",
         "icon": "$(refresh)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.astGraph.openReport",
+        "command": "edlc.astGraph.openReport",
         "title": "Open AST Graph Report",
         "icon": "$(type-hierarchy)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.astGraph.rescan",
+        "command": "edlc.astGraph.rescan",
         "title": "Rescan AST Graph (clean)",
         "icon": "$(refresh)",
-        "category": "AIDLC"
+        "category": "EDLC"
       },
       {
-        "command": "aidlc.astGraph.reregisterMcp",
+        "command": "edlc.astGraph.reregisterMcp",
         "title": "Re-register AST Graph MCP Server",
         "icon": "$(plug)",
-        "category": "AIDLC"
+        "category": "EDLC"
       }
     ],
     "configuration": {
-      "title": "AIDLC",
+      "title": "EDLC",
       "properties": {
-        "aidlc.tokenMonitor.enabled": {
+        "edlc.tokenMonitor.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Show a status bar item with today/this-month Claude token spend, parsed from ~/.claude/projects logs."
         },
-        "aidlc.tokenMonitor.refreshSeconds": {
+        "edlc.tokenMonitor.refreshSeconds": {
           "type": "number",
           "default": 60,
           "minimum": 15,
           "description": "How often to re-scan ~/.claude/projects for new usage records (seconds, minimum 15)."
         },
-        "aidlc.tokenMonitor.suggestionWindowDays": {
+        "edlc.tokenMonitor.suggestionWindowDays": {
           "type": "number",
           "default": 30,
           "minimum": 1,
           "description": "Window the cost-suggestion engine scans (in days). Older logs are skipped — they don't reflect current habits."
         },
-        "aidlc.astGraph.enabled": {
+        "edlc.astGraph.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Auto-download the ast-graph CLI, scan the workspace in the background, and register it as a Claude MCP server so Claude can read structural code context cheaply."
         },
-        "aidlc.astGraph.autoRescanDebounceSeconds": {
+        "edlc.astGraph.autoRescanDebounceSeconds": {
           "type": "number",
           "default": 5,
           "minimum": 1,
@@ -222,96 +222,96 @@
     "menus": {
       "view/title": [
         {
-          "command": "aidlc.openBuilder",
-          "when": "view == aidlcSidebar",
+          "command": "edlc.openBuilder",
+          "when": "view == edlcSidebar",
           "group": "navigation@0"
         },
         {
-          "command": "aidlc.openEpicsList",
-          "when": "view == aidlcSidebar",
+          "command": "edlc.openEpicsList",
+          "when": "view == edlcSidebar",
           "group": "navigation@1"
         },
         {
-          "command": "aidlc.openClaudeTerminal",
-          "when": "view == aidlcSidebar",
+          "command": "edlc.openClaudeTerminal",
+          "when": "view == edlcSidebar",
           "group": "navigation@2"
         },
         {
-          "command": "aidlc.astGraph.openReport",
-          "when": "view == aidlcSidebar",
+          "command": "edlc.astGraph.openReport",
+          "when": "view == edlcSidebar",
           "group": "navigation@3"
         }
       ]
     },
     "walkthroughs": [
       {
-        "id": "aidlc.gettingStarted",
-        "title": "Get started with AIDLC",
+        "id": "edlc.gettingStarted",
+        "title": "Get started with EDLC",
         "description": "Drive Claude through any pipeline declared in workspace.yaml — visually, from the editor.",
         "steps": [
           {
-            "id": "aidlc.welcome",
-            "title": "Welcome to AIDLC",
-            "description": "AIDLC turns a single `workspace.yaml` into a runnable pipeline of Claude agents — edit it visually, run epics step-by-step, approve or reject each handoff.\n\nThe fastest way to feel it is to load the demo project in the next step.",
+            "id": "edlc.welcome",
+            "title": "Welcome to EDLC",
+            "description": "EDLC turns a single `workspace.yaml` into a runnable pipeline of Claude agents — edit it visually, run epics step-by-step, approve or reject each handoff.\n\nThe fastest way to feel it is to load the demo project in the next step.",
             "media": {
               "markdown": "media/walkthrough/welcome.md"
             }
           },
           {
-            "id": "aidlc.loadDemo",
+            "id": "edlc.loadDemo",
             "title": "Load the demo project",
-            "description": "One click scaffolds a full pipeline plus 6 sample epics into your current folder — no YAML to write.\n[Load Demo Project](command:aidlc.loadDemoProject)",
+            "description": "One click scaffolds a full pipeline plus 6 sample epics into your current folder — no YAML to write.\n[Load Demo Project](command:edlc.loadDemoProject)",
             "media": {
               "markdown": "media/walkthrough/demo.md"
             },
             "completionEvents": [
-              "onCommand:aidlc.loadDemoProject"
+              "onCommand:edlc.loadDemoProject"
             ]
           },
           {
-            "id": "aidlc.builder",
+            "id": "edlc.builder",
             "title": "Open the Workspace Builder",
-            "description": "Visual editor for your agents, skills, and pipelines. Add an agent, swap its model, edit a skill inline.\n[Open Workspace Builder](command:aidlc.openBuilder)",
+            "description": "Visual editor for your agents, skills, and pipelines. Add an agent, swap its model, edit a skill inline.\n[Open Workspace Builder](command:edlc.openBuilder)",
             "media": {
               "markdown": "media/walkthrough/builder.md"
             },
             "completionEvents": [
-              "onCommand:aidlc.openBuilder"
+              "onCommand:edlc.openBuilder"
             ]
           },
           {
-            "id": "aidlc.runEpic",
+            "id": "edlc.runEpic",
             "title": "Run your first epic",
-            "description": "Pick a sample epic and watch Claude work through the pipeline. Approve, reject, or rerun any step.\n[Open Epics List](command:aidlc.openEpicsList) · [Start Epic](command:aidlc.startEpic)",
+            "description": "Pick a sample epic and watch Claude work through the pipeline. Approve, reject, or rerun any step.\n[Open Epics List](command:edlc.openEpicsList) · [Start Epic](command:edlc.startEpic)",
             "media": {
               "markdown": "media/walkthrough/epics.md"
             },
             "completionEvents": [
-              "onCommand:aidlc.openEpicsList",
-              "onCommand:aidlc.startEpic"
+              "onCommand:edlc.openEpicsList",
+              "onCommand:edlc.startEpic"
             ]
           },
           {
-            "id": "aidlc.terminal",
+            "id": "edlc.terminal",
             "title": "Drive runs from the terminal",
-            "description": "One-click zsh terminal in the bottom panel with the Claude CLI auto-launched. Use slash commands or run `aidlc` directly.\n[Open Claude CLI Terminal](command:aidlc.openClaudeTerminal)",
+            "description": "One-click zsh terminal in the bottom panel with the Claude CLI auto-launched. Use slash commands or run `edlc` directly.\n[Open Claude CLI Terminal](command:edlc.openClaudeTerminal)",
             "media": {
               "markdown": "media/walkthrough/terminal.md"
             },
             "completionEvents": [
-              "onCommand:aidlc.openClaudeTerminal"
+              "onCommand:edlc.openClaudeTerminal"
             ]
           },
           {
-            "id": "aidlc.buildYourOwn",
+            "id": "edlc.buildYourOwn",
             "title": "Build your own workspace",
-            "description": "Scaffold a fresh `.aidlc/workspace.yaml`, add custom skills/agents/pipelines, save the result as a reusable template.\n[Init Sample Workspace](command:aidlc.initWorkspace) · [Add Skill](command:aidlc.addSkill) · [Add Agent](command:aidlc.addAgent) · [Save as Template](command:aidlc.savePreset)",
+            "description": "Scaffold a fresh `.edlc/workspace.yaml`, add custom skills/agents/pipelines, save the result as a reusable template.\n[Init Sample Workspace](command:edlc.initWorkspace) · [Add Skill](command:edlc.addSkill) · [Add Agent](command:edlc.addAgent) · [Save as Template](command:edlc.savePreset)",
             "media": {
               "markdown": "media/walkthrough/build.md"
             },
             "completionEvents": [
-              "onCommand:aidlc.initWorkspace",
-              "onCommand:aidlc.savePreset"
+              "onCommand:edlc.initWorkspace",
+              "onCommand:edlc.savePreset"
             ]
           }
         ]
@@ -331,7 +331,7 @@
     "package": "pnpm typecheck && pnpm clean:out && pnpm bundle:webviews && pnpm bundle:prod && vsce package --no-dependencies"
   },
   "dependencies": {
-    "@aidlc/core": "workspace:*",
+    "@edlc/core": "workspace:*",
     "js-yaml": "^4.1.1"
   },
   "devDependencies": {

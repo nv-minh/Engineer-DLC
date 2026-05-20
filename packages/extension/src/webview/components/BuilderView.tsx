@@ -39,7 +39,7 @@ export function BuilderView({ state }: { state: WorkspaceState }) {
 
   // Agent picker shown in AddPipelineModal — project + global only.
   // Mirrors the Agents tab so the user picks from the same set they see
-  // in the Builder, not the workspace.yaml-only AIDLC layer (which is
+  // in the Builder, not the workspace.yaml-only EDLC layer (which is
   // hidden from the UI for this exact reason).
   const pipelineAgents = useMemo(
     () => state.agents.filter((a) => a.scope === 'project' || a.scope === 'global'),
@@ -71,7 +71,7 @@ export function BuilderView({ state }: { state: WorkspaceState }) {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">AIDLC Builder</h1>
+          <h1 className="text-xl font-bold text-foreground">EDLC Builder</h1>
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
             <span>Workspace</span>
             <span>·</span>
@@ -170,7 +170,7 @@ function pickInitialScope<T extends { scope: AssetScope }>(
   items: T[],
   persisted: AssetScope | undefined,
 ): AssetScope {
-  // AIDLC scope is intentionally hidden from the picker dropdown — never
+  // EDLC scope is intentionally hidden from the picker dropdown — never
   // return it here, otherwise the dropdown shows the wrong label (its
   // option doesn't exist) and the list filter quietly displays the
   // hidden bucket. Picker has only project + global now.
@@ -208,7 +208,7 @@ function ScopeFilter({
 
 function AgentsByScope({ agents, skills }: { agents: AgentSummary[]; skills: SkillSummary[] }) {
   const grouped = useMemo(() => groupByScope(agents), [agents]);
-  const counts = { project: grouped.project.length, aidlc: grouped.aidlc.length, global: grouped.global.length };
+  const counts = { project: grouped.project.length, edlc: grouped.edlc.length, global: grouped.global.length };
   const [scope, setScope] = useState<AssetScope>(() =>
     pickInitialScope(agents, getPersistedUi<PersistedBuilderUi>()?.agentScope),
   );
@@ -219,8 +219,8 @@ function AgentsByScope({ agents, skills }: { agents: AgentSummary[]; skills: Ski
     }
   }, [agents, grouped, scope]);
 
-  const aidlcIds = useMemo(
-    () => agents.filter((a) => a.scope === 'aidlc').map((a) => a.id),
+  const edlcIds = useMemo(
+    () => agents.filter((a) => a.scope === 'edlc').map((a) => a.id),
     [agents],
   );
   if (agents.length === 0) { return <EmptyHint kind="agents" />; }
@@ -240,7 +240,7 @@ function AgentsByScope({ agents, skills }: { agents: AgentSummary[]; skills: Ski
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((a) => (
-            <AgentCard key={`${a.scope}/${a.id}`} agent={a} allAgentIds={aidlcIds} skills={skills} />
+            <AgentCard key={`${a.scope}/${a.id}`} agent={a} allAgentIds={edlcIds} skills={skills} />
           ))}
         </div>
       )}
@@ -250,7 +250,7 @@ function AgentsByScope({ agents, skills }: { agents: AgentSummary[]; skills: Ski
 
 function SkillsByScope({ skills }: { skills: SkillSummary[] }) {
   const grouped = useMemo(() => groupByScope(skills), [skills]);
-  const counts = { project: grouped.project.length, aidlc: grouped.aidlc.length, global: grouped.global.length };
+  const counts = { project: grouped.project.length, edlc: grouped.edlc.length, global: grouped.global.length };
   const [scope, setScope] = useState<AssetScope>(() =>
     pickInitialScope(skills, getPersistedUi<PersistedBuilderUi>()?.skillScope),
   );
@@ -261,8 +261,8 @@ function SkillsByScope({ skills }: { skills: SkillSummary[] }) {
     }
   }, [skills, grouped, scope]);
 
-  const aidlcIds = useMemo(
-    () => skills.filter((s) => s.scope === 'aidlc').map((s) => s.id),
+  const edlcIds = useMemo(
+    () => skills.filter((s) => s.scope === 'edlc').map((s) => s.id),
     [skills],
   );
   if (skills.length === 0) { return <EmptyHint kind="skills" />; }
@@ -282,7 +282,7 @@ function SkillsByScope({ skills }: { skills: SkillSummary[] }) {
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((s) => (
-            <SkillCard key={`${s.scope}/${s.id}`} skill={s} allSkillIds={aidlcIds} />
+            <SkillCard key={`${s.scope}/${s.id}`} skill={s} allSkillIds={edlcIds} />
           ))}
         </div>
       )}
@@ -291,7 +291,7 @@ function SkillsByScope({ skills }: { skills: SkillSummary[] }) {
 }
 
 function SkillCard({ skill, allSkillIds }: { skill: SkillSummary; allSkillIds: string[] }) {
-  const isAidlc = skill.scope === 'aidlc';
+  const isAidlc = skill.scope === 'edlc';
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const onClick = () => {
@@ -427,7 +427,7 @@ function PipelinesGrid({ state }: { state: WorkspaceState }) {
   if (state.pipelines.length === 0) { return <EmptyHint kind="pipelines" />; }
   // PipelineCard renders existing steps + lets the user swap the agent on
   // each row. Existing built-in pipelines reference workspace.yaml-only
-  // AIDLC agents (`plan`, `design`, …); new ones reference file-based
+  // EDLC agents (`plan`, `design`, …); new ones reference file-based
   // project/global agents. Pass the union so both render correctly.
   const allAgents = state.agents;
   const selected = state.pipelines.find((p) => p.id === selectedId) ?? state.pipelines[0];
@@ -517,7 +517,7 @@ function EpicsMiniGrid({ state }: { state: WorkspaceState }) {
 }
 
 function groupByScope<T extends { scope: AssetScope }>(items: T[]): Record<AssetScope, T[]> {
-  const out: Record<AssetScope, T[]> = { project: [], aidlc: [], global: [] };
+  const out: Record<AssetScope, T[]> = { project: [], edlc: [], global: [] };
   for (const it of items) { out[it.scope].push(it); }
   return out;
 }

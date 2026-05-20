@@ -197,7 +197,7 @@ export function StepConfigModal({ pipelineId, idx, step, agents, onSubmit, onClo
               type="text"
               value={runner}
               onChange={(e) => setRunner(e.target.value)}
-              placeholder={`.aidlc/scripts/validate-${step.agent}.mjs`}
+              placeholder={`.edlc/scripts/validate-${step.agent}.mjs`}
               spellCheck={false}
               className="w-full rounded-md border border-border bg-input/50 px-2.5 py-2 font-mono text-[11.5px] text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40"
             />

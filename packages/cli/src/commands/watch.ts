@@ -3,11 +3,11 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
 import Table from 'cli-table3';
-import { RunStateStore, type RunState } from '@aidlc/core';
+import { RunStateStore, type RunState } from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import { colorStatus } from '../runHelpers';
 
-const RUNS_GLOB = '.aidlc/runs/*.json';
+const RUNS_GLOB = '.edlc/runs/*.json';
 
 export function registerWatch(program: Command): void {
   program
@@ -57,14 +57,14 @@ function render(root: string, runIdFilter?: string): void {
   const filtered = runIdFilter ? all.filter(r => r.runId === runIdFilter) : all;
 
   const ts = new Date().toLocaleTimeString();
-  console.log(chalk.bold('aidlc watch') + chalk.dim(`  ${ts}  ·  ${root}`));
+  console.log(chalk.bold('edlc watch') + chalk.dim(`  ${ts}  ·  ${root}`));
   console.log(chalk.dim('Ctrl+C to stop\n'));
 
   if (filtered.length === 0) {
     if (runIdFilter) {
       console.log(chalk.yellow(`No run named "${runIdFilter}". Existing: ${all.map(r => r.runId).join(', ') || '(none)'}`));
     } else {
-      console.log(chalk.dim('No runs in .aidlc/runs/  —  Try: aidlc run start <pipelineId>'));
+      console.log(chalk.dim('No runs in .edlc/runs/  —  Try: edlc run start <pipelineId>'));
     }
     return;
   }

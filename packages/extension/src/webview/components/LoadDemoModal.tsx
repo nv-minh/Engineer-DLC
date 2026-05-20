@@ -6,7 +6,7 @@ interface Props {
 }
 
 /**
- * Pops when the user clicks "Load Demo Project" but `~/aidlc-demo-project`
+ * Pops when the user clicks "Load Demo Project" but `~/edlc-demo-project`
  * already exists. Replaces the VS Code notification chrome with an inline
  * modal so the affordance lives in the same surface as the button.
  */
@@ -16,7 +16,7 @@ export function LoadDemoModal({ onChoose, onClose }: Props) {
       title="Demo project already exists"
       subtitle={
         <>
-          <span className="font-mono text-foreground/80">~/aidlc-demo-project</span>
+          <span className="font-mono text-foreground/80">~/edlc-demo-project</span>
         </>
       }
       onClose={onClose}
@@ -26,7 +26,7 @@ export function LoadDemoModal({ onChoose, onClose }: Props) {
         <ul className="ml-3 list-disc space-y-1 text-[11.5px] text-muted-foreground">
           <li>
             <span className="font-semibold text-foreground/80">Re-seed and open</span> —
-            wipes <span className="font-mono">.aidlc/</span> and{' '}
+            wipes <span className="font-mono">.edlc/</span> and{' '}
             <span className="font-mono">docs/epics/</span>, writes fresh demo data,
             then opens the folder.
           </li>

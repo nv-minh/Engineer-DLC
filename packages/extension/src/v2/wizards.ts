@@ -4,9 +4,9 @@
  * Three commands, all gated on a workspace folder being open. They share
  * yamlIO for reads/writes and `getWorkspaceRoot` for the root resolution.
  *
- *   aidlc.addSkill   — wizard: id → source picker → write .md + append to skills[]
- *   aidlc.addAgent   — wizard: id+name → skill picker → model picker → append to agents[]
- *   aidlc.addPipeline — wizard: id → multi-pick agents (ordered) → on_failure → append to pipelines[]
+ *   edlc.addSkill   — wizard: id → source picker → write .md + append to skills[]
+ *   edlc.addAgent   — wizard: id+name → skill picker → model picker → append to agents[]
+ *   edlc.addPipeline — wizard: id → multi-pick agents (ordered) → on_failure → append to pipelines[]
  *
  * Out of scope here: the visual drag-drop pipeline builder (M3 / Phase B).
  * The wizards write a workspace.yaml that the M3 webview will then read +
@@ -27,7 +27,7 @@ import {
   targetPath,
   type AssetScope,
   type AssetKind,
-} from '@aidlc/core';
+} from '@edlc/core';
 
 // ── Shared helpers ──────────────────────────────────────────────────────
 
@@ -43,7 +43,7 @@ async function loadOrInit(): Promise<{ root: string; doc: YamlDocument } | undef
   const root = getWorkspaceRoot();
   if (!root) {
     void vscode.window.showWarningMessage(
-      'AIDLC: Open a folder first.',
+      'EDLC: Open a folder first.',
     );
     return undefined;
   }
@@ -51,11 +51,11 @@ async function loadOrInit(): Promise<{ root: string; doc: YamlDocument } | undef
   const doc = readYaml(root);
   if (!doc) {
     const choice = await vscode.window.showWarningMessage(
-      `AIDLC: No .aidlc/${WORKSPACE_FILENAME} found. Initialize one first?`,
+      `EDLC: No .edlc/${WORKSPACE_FILENAME} found. Initialize one first?`,
       'Init Sample Workspace',
     );
     if (choice === 'Init Sample Workspace') {
-      void vscode.commands.executeCommand('aidlc.initWorkspace');
+      void vscode.commands.executeCommand('edlc.initWorkspace');
     }
     return undefined;
   }
@@ -92,8 +92,8 @@ async function promptUniqueId(opts: {
  * different on-disk locations and have different sharing semantics:
  *
  *   - project → `<ws>/.claude/...`        committable, this project only
- *   - aidlc   → `<ws>/.aidlc/...`         committable, shared with team via the
- *                                         AIDLC framework (also entered into
+ *   - edlc   → `<ws>/.edlc/...`         committable, shared with team via the
+ *                                         EDLC framework (also entered into
  *                                         workspace.yaml)
  *   - global  → `~/.claude/...`           personal, every project on this machine
  *
@@ -113,12 +113,12 @@ async function pickScope(kind: AssetKind): Promise<AssetScope | undefined> {
         value: 'project' as AssetScope,
       },
       {
-        label: '$(package) AIDLC',
-        description: '.aidlc/' + noun + 's/',
+        label: '$(package) EDLC',
+        description: '.edlc/' + noun + 's/',
         detail:
-          `AIDLC framework ${noun}. Commit to repo, declared in workspace.yaml, ` +
+          `EDLC framework ${noun}. Commit to repo, declared in workspace.yaml, ` +
           `share with team via the SDLC pipeline (epic, prd, tech-design, review, release...).`,
-        value: 'aidlc' as AssetScope,
+        value: 'edlc' as AssetScope,
       },
       {
         label: '$(home) Global',
@@ -216,14 +216,14 @@ export async function addSkillCommand(): Promise<void> {
   }
   fs.writeFileSync(skillPath, content, 'utf8');
 
-  // AIDLC scope is the only one that registers in workspace.yaml — the
+  // EDLC scope is the only one that registers in workspace.yaml — the
   // pipeline runner reads agents/skills from there. Project + global skills
   // are file-only catalog entries (sit alongside Claude Code's own
   // .claude/ skills) and are surfaced through the discovery layer.
-  if (scope === 'aidlc') {
+  if (scope === 'edlc') {
     doc.skills.push({
       id: skillId,
-      path: `./.aidlc/skills/${skillId}.md`,
+      path: `./.edlc/skills/${skillId}.md`,
     });
     writeYaml(root, doc);
   }
@@ -235,7 +235,7 @@ export async function addSkillCommand(): Promise<void> {
     await vscode.window.showTextDocument(docOpen, { preview: false });
   }
 
-  const yamlNote = scope === 'aidlc' ? ' + workspace.yaml' : '';
+  const yamlNote = scope === 'edlc' ? ' + workspace.yaml' : '';
   void vscode.window.showInformationMessage(
     `Skill \`${skillId}\` added (${scope}) — ${displayPath(root, skillPath)}${yamlNote}.`,
   );
@@ -324,8 +324,8 @@ export async function addAgentCommand(): Promise<void> {
   const scope = await pickScope('agent');
   if (!scope) { return; }
 
-  // Every agent — aidlc, project, or global — must reference at least one
-  // skill at creation time. AIDLC agents resolve skills at runtime; project
+  // Every agent — edlc, project, or global — must reference at least one
+  // skill at creation time. EDLC agents resolve skills at runtime; project
   // and global agents inline the picked skills' content into the .md body
   // as a starting prompt the user can then edit.
   if (doc.skills.length === 0) {
@@ -334,7 +334,7 @@ export async function addAgentCommand(): Promise<void> {
       'Add Skill',
     );
     if (choice === 'Add Skill') {
-      void vscode.commands.executeCommand('aidlc.addSkill');
+      void vscode.commands.executeCommand('edlc.addSkill');
     }
     return;
   }
@@ -354,7 +354,7 @@ export async function addAgentCommand(): Promise<void> {
   });
   if (!name || !name.trim()) { return; }
 
-  if (scope === 'aidlc') {
+  if (scope === 'edlc') {
     await addAidlcAgent(root, doc, agentId, name.trim());
   } else {
     await addClaudeAgent(root, doc, scope, agentId, name.trim());
@@ -364,7 +364,7 @@ export async function addAgentCommand(): Promise<void> {
 /**
  * Multi-select skill picker. Returns the picked skill ids, or undefined
  * if the user cancels (Esc or Enter with nothing selected — both treated
- * as "abort the wizard"). Shared by aidlc and Claude-native agent flows.
+ * as "abort the wizard"). Shared by edlc and Claude-native agent flows.
  */
 async function pickSkills(doc: YamlDocument): Promise<string[] | undefined> {
   const skillPicks = await vscode.window.showQuickPick(
@@ -417,7 +417,7 @@ function loadSkillContentForInline(
 }
 
 /**
- * AIDLC-scope agent: declared in workspace.yaml, referenced by pipelines.
+ * EDLC-scope agent: declared in workspace.yaml, referenced by pipelines.
  * Walks the user through skill / model / env / capabilities pickers (the
  * existing flow before scope was introduced) and appends the result to
  * `agents[]`.
@@ -462,7 +462,7 @@ async function addAidlcAgent(
 
   const skillsLabel = skillIds.join(', ');
   void vscode.window.showInformationMessage(
-    `Agent \`${agentId}\` added (aidlc · skills: ${skillsLabel}, model: ${modelPick.label})${extraNote}.`,
+    `Agent \`${agentId}\` added (edlc · skills: ${skillsLabel}, model: ${modelPick.label})${extraNote}.`,
   );
 }
 
@@ -725,7 +725,7 @@ export async function promptStepConfig(
   if (autoReview.value) {
     autoReviewRunner = await vscode.window.showInputBox({
       prompt: `[${agentId}] auto_review_runner — path to validator script (relative to workspace root)`,
-      placeHolder: '.aidlc/scripts/validate-' + agentId + '.mjs',
+      placeHolder: '.edlc/scripts/validate-' + agentId + '.mjs',
       value: defaults?.auto_review_runner ?? '',
       ignoreFocusOut: true,
       validateInput: (v) => (v.trim().length === 0 ? 'Required when auto_review is enabled' : null),
@@ -760,7 +760,7 @@ export async function addPipelineCommand(): Promise<void> {
       'Add Agent',
     );
     if (choice === 'Add Agent') {
-      void vscode.commands.executeCommand('aidlc.addAgent');
+      void vscode.commands.executeCommand('edlc.addAgent');
     }
     return;
   }

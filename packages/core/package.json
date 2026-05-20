@@ -1,7 +1,7 @@
 {
-  "name": "@aidlc/core",
+  "name": "@edlc/core",
   "version": "0.0.1",
-  "description": "AIDLC core engine — workspace loader, runner registry, pipeline executor. Pure TypeScript (no vscode dep).",
+  "description": "EDLC core engine — workspace loader, runner registry, pipeline executor. Pure TypeScript (no vscode dep).",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [

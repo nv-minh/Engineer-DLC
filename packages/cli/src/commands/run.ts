@@ -12,7 +12,7 @@ import {
   RUN_ID_PATTERN,
   type RunState,
   type PipelineConfig,
-} from '@aidlc/core';
+} from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import {
   requireRun,
@@ -67,7 +67,7 @@ export function registerRun(program: Command): void {
       const first = state.steps[0];
       if (first) {
         console.log(chalk.dim(`  Current step: ${chalk.bold(first.agent)} — awaiting_work`));
-        console.log(chalk.dim(`  When done: aidlc run mark-done ${runId}`));
+        console.log(chalk.dim(`  When done: edlc run mark-done ${runId}`));
       }
     });
 
@@ -87,7 +87,7 @@ export function registerRun(program: Command): void {
         if (err instanceof PipelineRunError && err.missing?.length) {
           console.error(chalk.red('Missing artifacts — step not marked done:'));
           for (const m of err.missing) { console.error(chalk.dim(`  ✘ ${m}`)); }
-          console.error(chalk.dim('\nProduce the files above, then retry: aidlc run mark-done ' + runId));
+          console.error(chalk.dim('\nProduce the files above, then retry: edlc run mark-done ' + runId));
         } else {
           console.error(chalk.red(err instanceof Error ? err.message : String(err)));
         }
@@ -98,8 +98,8 @@ export function registerRun(program: Command): void {
       const step = next.steps[state.currentStepIdx];
       if (step.status === 'awaiting_review') {
         console.log(chalk.cyan('✔') + ` Step "${step.agent}" is now ${chalk.cyan('awaiting_review')}`);
-        console.log(chalk.dim(`  Approve: aidlc run approve ${runId}`));
-        console.log(chalk.dim(`  Reject:  aidlc run reject ${runId} --reason "..."`));
+        console.log(chalk.dim(`  Approve: edlc run approve ${runId}`));
+        console.log(chalk.dim(`  Reject:  edlc run reject ${runId} --reason "..."`));
       } else {
         console.log(chalk.green('✔') + ` Step "${step.agent}" auto-approved, advancing…`);
         printRunSummary(next);
@@ -160,7 +160,7 @@ export function registerRun(program: Command): void {
       const step = state.steps[state.currentStepIdx];
       console.log(chalk.red('✘') + ` Rejected "${step.agent}"`);
       console.log(chalk.dim(`  Reason: ${opts.reason}`));
-      console.log(chalk.dim(`  Rerun:  aidlc run rerun ${runId} [--feedback "..."]`));
+      console.log(chalk.dim(`  Rerun:  edlc run rerun ${runId} [--feedback "..."]`));
     });
 
   // ── rerun ──────────────────────────────────────────────────────────────────
@@ -184,7 +184,7 @@ export function registerRun(program: Command): void {
       const step = next.steps[next.currentStepIdx];
       console.log(chalk.yellow('↺') + ` Rerunning "${step.agent}" (rev ${step.revision})`);
       if (opts.feedback) { console.log(chalk.dim(`  Feedback: ${opts.feedback}`)); }
-      console.log(chalk.dim(`  When done: aidlc run mark-done ${runId}`));
+      console.log(chalk.dim(`  When done: edlc run mark-done ${runId}`));
     });
 
   // ── delete ─────────────────────────────────────────────────────────────────
@@ -279,15 +279,15 @@ async function execLoop(
         continue;
       }
       console.log(chalk.cyan(`\n⏸  Step "${step.agent}" is awaiting human review.`));
-      console.log(chalk.dim(`  Approve: aidlc run approve ${runId}`));
-      console.log(chalk.dim(`  Reject:  aidlc run reject ${runId} --reason "..."`));
+      console.log(chalk.dim(`  Approve: edlc run approve ${runId}`));
+      console.log(chalk.dim(`  Reject:  edlc run reject ${runId} --reason "..."`));
       break;
     }
 
     // Stop at rejected unless user reruns
     if (step.status === 'rejected') {
       console.log(chalk.red(`\n✘  Step "${step.agent}" was rejected.`));
-      console.log(chalk.dim(`  Rerun: aidlc run rerun ${runId} [--feedback "..."]`));
+      console.log(chalk.dim(`  Rerun: edlc run rerun ${runId} [--feedback "..."]`));
       break;
     }
 
@@ -393,7 +393,7 @@ async function execStep(
 
   if (!result.success) {
     console.error(chalk.red(`\n✘  Step "${agentId}" failed (non-zero exit).`));
-    console.error(chalk.dim('   Fix the issue then retry: aidlc run exec ' + runId));
+    console.error(chalk.dim('   Fix the issue then retry: edlc run exec ' + runId));
     return false;
   }
 
@@ -406,7 +406,7 @@ async function execStep(
     if (err instanceof PipelineRunError && err.missing?.length) {
       console.error(chalk.red('\n✘  Step completed but missing expected artifacts:'));
       for (const m of err.missing) { console.error(chalk.dim(`   ✘ ${m}`)); }
-      console.error(chalk.dim('\n   Produce the files above, then: aidlc run mark-done ' + runId));
+      console.error(chalk.dim('\n   Produce the files above, then: edlc run mark-done ' + runId));
     } else {
       console.error(chalk.red(`\n✘  ${err instanceof Error ? err.message : String(err)}`));
     }

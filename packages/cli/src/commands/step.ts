@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { RunStateStore, type StepStatus } from '@aidlc/core';
+import { RunStateStore, type StepStatus } from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import {
   requireRun,
@@ -58,7 +58,7 @@ export function registerStep(program: Command): void {
       if (prevIdx !== idx && state.steps[prevIdx]?.agent) {
         console.log(chalk.dim(`  (Demoted previous current step ${prevIdx} to pending)`));
       }
-      console.log(chalk.dim(`  When done: aidlc run mark-done ${runId}`));
+      console.log(chalk.dim(`  When done: edlc run mark-done ${runId}`));
     });
 
   // ── done ───────────────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ export function registerStep(program: Command): void {
         ...state.steps[idx],
         status: 'approved',
         finishedAt: now,
-        feedback: opts.reason ?? 'Manually marked done via aidlc step done.',
+        feedback: opts.reason ?? 'Manually marked done via edlc step done.',
         artifactsProduced: state.steps[idx].artifactsProduced ?? [],
       };
 
@@ -117,7 +117,7 @@ export function registerStep(program: Command): void {
         ...state.steps[idx],
         status: 'approved',
         finishedAt: now,
-        feedback: 'Skipped via aidlc step skip.',
+        feedback: 'Skipped via edlc step skip.',
         artifactsProduced: [],
       };
 
@@ -163,7 +163,7 @@ export function registerStep(program: Command): void {
       RunStateStore.save(root, state);
       const agent = state.steps[idx].agent;
       console.log(chalk.dim('↺') + ` Step ${idx} "${agent}" → ${colorStatus('pending')}`);
-      console.log(chalk.dim(`  Use "aidlc step start ${runId} ${step}" to begin work on it.`));
+      console.log(chalk.dim(`  Use "edlc step start ${runId} ${step}" to begin work on it.`));
     });
 
   // ── set ────────────────────────────────────────────────────────────────────
@@ -209,7 +209,7 @@ export function registerStep(program: Command): void {
             ...state.steps[i],
             status: 'approved',
             finishedAt: now,
-            feedback: 'Auto-approved by aidlc step jump.',
+            feedback: 'Auto-approved by edlc step jump.',
           };
           autoApproved++;
         }

@@ -32,7 +32,7 @@ export interface EditAgentDraft {
   model: string;
   capabilities: string[];
   /** Persona→skill binding. For file-based agents the host writes this to
-   *  workspace.yaml's AIDLC layer (creating the entry if needed). */
+   *  workspace.yaml's EDLC layer (creating the entry if needed). */
   skills: string[];
 }
 
@@ -54,7 +54,7 @@ export function EditAgentModal({ agent, skills, onSubmit, onClose }: Props) {
   const [pickedSkills, setPickedSkills] = useState<string[]>(agent.skills ?? []);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Picker mirrors the Skills tab — project + global only. The aidlc-scope
+  // Picker mirrors the Skills tab — project + global only. The edlc-scope
   // entries are internal workspace.yaml bindings, not pickable assets.
   const projectSkills = useMemo(
     () => skills.filter((s) => s.scope === 'project'),
@@ -172,7 +172,7 @@ export function EditAgentModal({ agent, skills, onSubmit, onClose }: Props) {
             </label>
             {/* Scope tabs — same project/global split as the Skills tab so
                 the user picks from one origin at a time instead of scrolling
-                a flat list of dozens. AIDLC-scope skills are intentionally
+                a flat list of dozens. EDLC-scope skills are intentionally
                 hidden (they're internal workspace.yaml bindings). */}
             <div className="inline-flex shrink-0 rounded-md border border-border bg-card p-0.5 text-[10.5px]">
               <button
@@ -241,7 +241,7 @@ export function EditAgentModal({ agent, skills, onSubmit, onClose }: Props) {
                 })
               )}
               {/* Surface skills currently bound that aren't in the pickable
-                  list (e.g. AIDLC built-in phase skills). Lets the user
+                  list (e.g. EDLC built-in phase skills). Lets the user
                   see + un-toggle them without losing track of the binding.
                   Always visible regardless of the active scope tab. */}
               {pickedSkills
@@ -374,7 +374,7 @@ export function EditAgentModal({ agent, skills, onSubmit, onClose }: Props) {
 function inferName(agent: AgentSummary): string {
   // AgentSummary doesn't carry the YAML `name:` field directly today — the
   // host could surface it later. For now derive from id.
-  return agent.id.replace(/^aidlc-/, '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  return agent.id.replace(/^edlc-/, '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function truncatePath(p: string): string {

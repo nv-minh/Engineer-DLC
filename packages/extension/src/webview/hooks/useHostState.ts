@@ -3,11 +3,11 @@ import { onHostMessage, postMessage } from '../lib/bridge';
 
 /**
  * Subscribe to `{ type: 'state', state }` messages from the host.
- * Returns the latest state, seeded from `window.__AIDLC_INITIAL_STATE__`
+ * Returns the latest state, seeded from `window.__EDLC_INITIAL_STATE__`
  * if the host injected it before the React bundle loaded.
  */
 export function useHostState<T>(): T | null {
-  const seed = (typeof window !== 'undefined' && (window.__AIDLC_INITIAL_STATE__ as T)) || null;
+  const seed = (typeof window !== 'undefined' && (window.__EDLC_INITIAL_STATE__ as T)) || null;
   const [state, setState] = useState<T | null>(seed);
 
   useEffect(() => {

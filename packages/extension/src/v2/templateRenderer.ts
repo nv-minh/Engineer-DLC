@@ -1,5 +1,5 @@
 /**
- * Tech-stack-aware template renderer for AIDLC skill / agent markdown.
+ * Tech-stack-aware template renderer for EDLC skill / agent markdown.
  *
  * Templates use `{{#if STACK}}…{{/if}}` blocks where STACK is a tech-stack
  * id (web, mobile, desktop, backend, cli). At install time the renderer is

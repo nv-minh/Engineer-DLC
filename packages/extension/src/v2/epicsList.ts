@@ -11,7 +11,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { RunStateStore, normalizeStep, resolvePath } from '@aidlc/core';
+import { RunStateStore, normalizeStep, resolvePath } from '@edlc/core';
 import type {
   RunState,
   StepStatus,
@@ -19,7 +19,7 @@ import type {
   PipelineConfig,
   PipelineStepConfig,
   StepHistoryEntry,
-} from '@aidlc/core';
+} from '@edlc/core';
 
 import { readYaml, type YamlDocument } from './yamlIO';
 import {
@@ -53,7 +53,7 @@ export interface EpicSummary {
     startedAt: string | null;
     finishedAt: string | null;
     /**
-     * When this epic has a matching pipeline run (`.aidlc/runs/<id>.json`),
+     * When this epic has a matching pipeline run (`.edlc/runs/<id>.json`),
      * this is the per-step status from the run-state machine. Richer than
      * `status` — surfaces `awaiting_work` / `awaiting_auto_review` /
      * `awaiting_review` / `rejected` so the panel can show the right
@@ -85,7 +85,7 @@ export interface EpicSummary {
   tokenUsage?: EpicUsage;
   /**
    * runId of the matching run state, if any. Convention: runId === epic.id.
-   * When set, the panel can dispatch `aidlc.markStepDone` etc. with this id.
+   * When set, the panel can dispatch `edlc.markStepDone` etc. with this id.
    */
   runId: string | null;
   /** Resolved inputs (capability id → user-supplied value). Keys may be empty. */
@@ -301,7 +301,7 @@ export async function enrichEpicsWithUsage(
   const mtimes: number[] = [];
   for (const epic of epics) {
     if (!epic.runId) continue;
-    const runFile = path.join(workspaceRoot, '.aidlc', 'runs', `${epic.runId}.json`);
+    const runFile = path.join(workspaceRoot, '.edlc', 'runs', `${epic.runId}.json`);
     let stat: fs.Stats;
     try { stat = fs.statSync(runFile); } catch { continue; }
     let runState: RunState | null = null;
@@ -352,7 +352,7 @@ function readInputs(epicDir: string): Record<string, string> {
  * epic-state file is what gets committed (under `docs/epics/<id>/`), so
  * preserving step history + statuses there means another teammate who
  * pulls the repo can see the full audit trail without needing the local
- * `.aidlc/runs/` files.
+ * `.edlc/runs/` files.
  *
  * Convention: `runState.runId === epicId`. No-op when the epic dir
  * doesn't exist (the run isn't bound to an epic — e.g. a standalone
@@ -446,7 +446,7 @@ export interface MigrationReport {
 /**
  * Walk every epic dir under <state.root>:
  *
- *   - Has a matching `.aidlc/runs/<id>.json`         → mirror it back
+ *   - Has a matching `.edlc/runs/<id>.json`         → mirror it back
  *     into state.json so the on-disk schema picks up
  *     `revision` / `runStatus` / `history` / `feedback` /
  *     `autoReviewVerdict` / `artifactsProduced` and the epic-level

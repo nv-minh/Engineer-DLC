@@ -14,7 +14,7 @@
  * ## Validator module shape
  *
  * ```js
- * // .aidlc/scripts/validate-prd.mjs
+ * // .edlc/scripts/validate-prd.mjs
  * export default async function ({ workspaceRoot, state, step, pipeline, paths }) {
  *   const fs = await import('node:fs');
  *   const prd = fs.readFileSync(paths.produces[0], 'utf8');

@@ -1,11 +1,11 @@
 import { Command } from 'commander';
-import { RunStateStore, normalizeStep, WorkspaceLoader } from '@aidlc/core';
+import { RunStateStore, normalizeStep, WorkspaceLoader } from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 
 export function registerStatus(program: Command): void {
   program
     .command('status [runId]')
-    .description('List runs in .aidlc/runs/, or show one run in detail')
+    .description('List runs in .edlc/runs/, or show one run in detail')
     .option('--json', 'output JSON')
     .action(async (runId: string | undefined, opts: { json?: boolean }, cmd: Command) => {
       const root = resolveWorkspaceRoot(cmd);
@@ -17,7 +17,7 @@ export function registerStatus(program: Command): void {
           return;
         }
         if (runs.length === 0) {
-          console.log('No runs in .aidlc/runs/');
+          console.log('No runs in .edlc/runs/');
           return;
         }
         console.log(`${runs.length} run(s):`);

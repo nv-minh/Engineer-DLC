@@ -1,5 +1,5 @@
 /**
- * Read / mutate / write `.aidlc/workspace.yaml`.
+ * Read / mutate / write `.edlc/workspace.yaml`.
  *
  * The wizards (addSkill / addAgent / addPipeline) all need to append items
  * to specific top-level arrays. js-yaml's round-trip is lossy with comments
@@ -18,7 +18,7 @@ import * as yaml from 'js-yaml';
 import {
   WORKSPACE_DIR,
   WORKSPACE_FILENAME,
-} from '@aidlc/core';
+} from '@edlc/core';
 
 export interface YamlDocument {
   version: string;
@@ -59,7 +59,7 @@ export function readYaml(workspaceRoot: string): YamlDocument | null {
 function normalize(doc: Record<string, unknown>): YamlDocument {
   return {
     version: typeof doc.version === 'string' ? doc.version : '1.0',
-    name: typeof doc.name === 'string' ? doc.name : 'AIDLC Workspace',
+    name: typeof doc.name === 'string' ? doc.name : 'EDLC Workspace',
     agents: Array.isArray(doc.agents) ? (doc.agents as Array<Record<string, unknown>>) : [],
     skills: Array.isArray(doc.skills) ? (doc.skills as Array<Record<string, unknown>>) : [],
     environment: (doc.environment && typeof doc.environment === 'object'

@@ -2,7 +2,7 @@
  * Unified Workspace webview — replaces the previous Builder + Epics panels
  * with a single React-rendered surface. The user navigates between Builder
  * and Epics views via the in-panel pill nav; the host treats both VS Code
- * commands (`aidlc.openBuilder`, `aidlc.openEpicsList`) as `show()` calls
+ * commands (`edlc.openBuilder`, `edlc.openEpicsList`) as `show()` calls
  * with different `initialView` arguments.
  *
  * Visual rendering lives in `src/webview/workspace/main.tsx` (compiled to
@@ -31,7 +31,7 @@ import {
   RunStateStore,
   startRun,
   targetPath,
-} from '@aidlc/core';
+} from '@edlc/core';
 import { SKILL_TEMPLATES } from './skillTemplates';
 import {
   loadBuiltinPreset,
@@ -51,7 +51,7 @@ import type {
   StepStatus,
   AutoReviewVerdict,
   StepHistoryEntry,
-} from '@aidlc/core';
+} from '@edlc/core';
 import { promptStepConfig, type PipelineStepConfigDraft } from './wizards';
 import {
   listEpics,
@@ -265,7 +265,7 @@ function buildState(initialView: WorkspaceView): WorkspaceState {
   const doc = readYaml(root);
   const discovered = discoverAssets(root);
 
-  // agent display metadata + slash commands — only AIDLC agents have these
+  // agent display metadata + slash commands — only EDLC agents have these
   // since they're declared in workspace.yaml.
   const agentMeta: Record<string, AgentMeta> = {};
   const slashCommandsByAgent: Record<string, string> = {};
@@ -527,9 +527,9 @@ function extractSkillIds(a: Record<string, unknown>): string[] {
  * Cheap built-in-preset detector. Recognizes two markers we write at the
  * very top of generated content:
  *
- * 1. `<!-- Composed by AIDLC Flow built-in preset "<id>" — phase: <phase> -->`
- *    — written by `composeSkill()` into each `.aidlc/skills/<phase>.md`.
- * 2. `<!-- AIDLC extension built-in — workflow: <id>, kind: agent|skill, id: <id> -->`
+ * 1. `<!-- Composed by EDLC Flow built-in preset "<id>" — phase: <phase> -->`
+ *    — written by `composeSkill()` into each `.edlc/skills/<phase>.md`.
+ * 2. `<!-- EDLC extension built-in — workflow: <id>, kind: agent|skill, id: <id> -->`
  *    — written by `globalDefaultsInstaller` into `~/.claude/agents/`
  *    and `~/.claude/skills/`.
  *
@@ -540,8 +540,8 @@ function detectBuiltinSource(filePath: string): string | undefined {
   if (!filePath || !fs.existsSync(filePath)) { return undefined; }
   try {
     const head = fs.readFileSync(filePath, 'utf8').slice(0, 200);
-    const composed = head.match(/<!-- Composed by AIDLC Flow built-in preset "([^"]+)"/);
-    const installed = head.match(/<!-- AIDLC extension built-in — workflow:\s*([^,\s]+)/);
+    const composed = head.match(/<!-- Composed by EDLC Flow built-in preset "([^"]+)"/);
+    const installed = head.match(/<!-- EDLC extension built-in — workflow:\s*([^,\s]+)/);
     const id = composed?.[1] ?? installed?.[1];
     if (!id) { return undefined; }
     const workflow = BUILTIN_WORKFLOWS.find((w) => w.id === id);
@@ -552,10 +552,10 @@ function detectBuiltinSource(filePath: string): string | undefined {
 function mergeAgents(doc: YamlDocument | null, root: string, discovered: DiscoveredAsset[]): AgentSummary[] {
   const out: AgentSummary[] = [];
 
-  // Workspace.yaml owns the persona ↔ skills binding for AIDLC personas, but
+  // Workspace.yaml owns the persona ↔ skills binding for EDLC personas, but
   // the same persona shows up in the Agents tab (and the AddPipeline picker)
   // as a project/global `.md` file. Build a lookup so file-based entries
-  // inherit their `skills:` array — the picker hides the AIDLC scope, so
+  // inherit their `skills:` array — the picker hides the EDLC scope, so
   // without this overlay the per-step skill picker would be empty.
   const yamlSkillsById = new Map<string, string[]>();
   if (doc) {
@@ -583,7 +583,7 @@ function mergeAgents(doc: YamlDocument | null, root: string, discovered: Discove
   if (doc) {
     // Pre-index workspace.yaml skill declarations by id so we can resolve
     // each agent's primary-skill path (built-in presets now reference
-    // `~/.claude/skills/aidlc-<workflow>-<phase>.md`, not `.aidlc/skills/`).
+    // `~/.claude/skills/edlc-<workflow>-<phase>.md`, not `.edlc/skills/`).
     const skillPathById = new Map<string, string>();
     for (const s of doc.skills) {
       const sid = String(s.id);
@@ -597,13 +597,13 @@ function mergeAgents(doc: YamlDocument | null, root: string, discovered: Discove
       const id = String(a.id);
       const skills = extractSkillIds(a);
       // Agents inherit `builtinFrom` from their primary skill — read the marker
-      // off whichever .md the skill declaration points at (legacy `.aidlc/skills/`
-      // or new `~/.claude/skills/aidlc-*`).
+      // off whichever .md the skill declaration points at (legacy `.edlc/skills/`
+      // or new `~/.claude/skills/edlc-*`).
       const primarySkillPath = skillPathById.get(skills[0] ?? id)
         ?? path.join(root, WORKSPACE_DIR, 'skills', `${skills[0] ?? id}.md`);
       out.push({
         id,
-        scope: 'aidlc',
+        scope: 'edlc',
         filePath: '',
         description: typeof a.description === 'string' ? a.description : (typeof a.name === 'string' ? a.name : undefined),
         skill: skills[0],
@@ -793,7 +793,7 @@ function mergeSkills(
     for (const s of doc.skills) {
       const id = String(s.id);
       if (s.builtin) {
-        out.push({ id, scope: 'aidlc', filePath: '', description: 'builtin' });
+        out.push({ id, scope: 'edlc', filePath: '', description: 'builtin' });
         continue;
       }
       const skillPath = typeof s.path === 'string' ? s.path : undefined;
@@ -801,7 +801,7 @@ function mergeSkills(
       const abs = expanded
         ? (path.isAbsolute(expanded) ? expanded : path.resolve(root, expanded))
         : '';
-      out.push({ id, scope: 'aidlc', filePath: abs, builtinFrom: detectBuiltinSource(abs) });
+      out.push({ id, scope: 'edlc', filePath: abs, builtinFrom: detectBuiltinSource(abs) });
     }
   }
   for (const s of discovered.filter((x) => x.scope === 'global')) {
@@ -826,8 +826,8 @@ export class WorkspaceWebview {
       return;
     }
     const panel = vscode.window.createWebviewPanel(
-      'aidlc.workspace',
-      'AIDLC Workspace',
+      'edlc.workspace',
+      'EDLC Workspace',
       column,
       {
         enableScripts: true,
@@ -895,7 +895,7 @@ export class WorkspaceWebview {
       stateWatcher.onDidDelete(refresh, null, this.disposables);
       this.disposables.push(stateWatcher);
 
-      const runsPattern = new vscode.RelativePattern(vscode.Uri.file(root), '.aidlc/runs/*.json');
+      const runsPattern = new vscode.RelativePattern(vscode.Uri.file(root), '.edlc/runs/*.json');
       const runsWatcher = vscode.workspace.createFileSystemWatcher(runsPattern);
       runsWatcher.onDidChange(refresh, null, this.disposables);
       runsWatcher.onDidCreate(refresh, null, this.disposables);
@@ -969,19 +969,19 @@ export class WorkspaceWebview {
       // Delegations
       case 'init': {
         const workflowId = typeof msg.workflowId === 'string' ? msg.workflowId : undefined;
-        await vscode.commands.executeCommand('aidlc.initWorkspace', workflowId);
+        await vscode.commands.executeCommand('edlc.initWorkspace', workflowId);
         return;
       }
-      case 'applyPreset':  await vscode.commands.executeCommand('aidlc.applyPreset');   return;
+      case 'applyPreset':  await vscode.commands.executeCommand('edlc.applyPreset');   return;
       case 'initSdlcPreset':
-        await vscode.commands.executeCommand('aidlc.applyPreset', 'sdlc-pipeline', true);
+        await vscode.commands.executeCommand('edlc.applyPreset', 'sdlc-pipeline', true);
         return;
-      case 'savePreset':   await vscode.commands.executeCommand('aidlc.savePreset');    return;
-      case 'startEpic':    await vscode.commands.executeCommand('aidlc.startEpic');     return;
-      case 'addAgent':     await vscode.commands.executeCommand('aidlc.addAgent');      return;
-      case 'addSkill':     await vscode.commands.executeCommand('aidlc.addSkill');      return;
-      case 'addPipeline':  await vscode.commands.executeCommand('aidlc.addPipeline');   return;
-      case 'openClaude':   await vscode.commands.executeCommand('aidlc.openClaudeTerminal'); return;
+      case 'savePreset':   await vscode.commands.executeCommand('edlc.savePreset');    return;
+      case 'startEpic':    await vscode.commands.executeCommand('edlc.startEpic');     return;
+      case 'addAgent':     await vscode.commands.executeCommand('edlc.addAgent');      return;
+      case 'addSkill':     await vscode.commands.executeCommand('edlc.addSkill');      return;
+      case 'addPipeline':  await vscode.commands.executeCommand('edlc.addPipeline');   return;
+      case 'openClaude':   await vscode.commands.executeCommand('edlc.openClaudeTerminal'); return;
       case 'openEpicsList':
         // Same-panel switch — don't re-execute the command (avoid recursion).
         this.setView('epics');
@@ -1002,10 +1002,10 @@ export class WorkspaceWebview {
         return;
       }
       case 'loadDemoProject':
-        await vscode.commands.executeCommand('aidlc.loadDemoProject');
+        await vscode.commands.executeCommand('edlc.loadDemoProject');
         return;
       case 'startPipelineRun':
-        await vscode.commands.executeCommand('aidlc.startPipelineRun');
+        await vscode.commands.executeCommand('edlc.startPipelineRun');
         return;
 
       // File-opening
@@ -1084,7 +1084,7 @@ export class WorkspaceWebview {
       case 'rerunStep':
       case 'openRunState': {
         const runId = String(msg.runId ?? '');
-        const cmd = `aidlc.${msg.type}`;
+        const cmd = `edlc.${msg.type}`;
         const stepIdx = typeof msg.stepIdx === 'number' && Number.isInteger(msg.stepIdx)
           ? msg.stepIdx
           : undefined;
@@ -1096,7 +1096,7 @@ export class WorkspaceWebview {
         // confirmed: webview already showed an inline ConfirmModal, skip the
         // VS Code warning dialog. Falsy for command-palette invocations.
         await vscode.commands.executeCommand(
-          'aidlc.deleteRun',
+          'edlc.deleteRun',
           runId || undefined,
           msg.confirmed === true,
         );
@@ -1173,7 +1173,7 @@ export class WorkspaceWebview {
         const feedback = String(msg.feedback ?? '');
         if (!slash || !runId) { return; }
         await vscode.commands.executeCommand(
-          'aidlc.runStepWithFeedback',
+          'edlc.runStepWithFeedback',
           slash,
           runId,
           feedback,
@@ -1191,7 +1191,7 @@ export class WorkspaceWebview {
       case 'savePresetInline': {
         const draft = msg.draft;
         if (!draft || typeof draft !== 'object') { return; }
-        await vscode.commands.executeCommand('aidlc.savePresetInline', draft);
+        await vscode.commands.executeCommand('edlc.savePresetInline', draft);
         return;
       }
       case 'pickAndReadFile': {
@@ -1277,7 +1277,7 @@ export class WorkspaceWebview {
         return;
       case 'runPipeline':
         await vscode.commands.executeCommand(
-          'aidlc.startPipelineRun',
+          'edlc.startPipelineRun',
           String(msg.pipelineId ?? ''),
         );
         return;
@@ -1315,7 +1315,7 @@ export class WorkspaceWebview {
 
   private getRootOrWarn(): string | undefined {
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!root) { void vscode.window.showWarningMessage('AIDLC: no folder open.'); }
+    if (!root) { void vscode.window.showWarningMessage('EDLC: no folder open.'); }
     return root;
   }
 
@@ -1324,7 +1324,7 @@ export class WorkspaceWebview {
     if (!root) { return; }
     const doc = readYaml(root);
     if (!doc) {
-      void vscode.window.showWarningMessage('AIDLC: no workspace.yaml — initialize first.');
+      void vscode.window.showWarningMessage('EDLC: no workspace.yaml — initialize first.');
       return;
     }
     const dirty = fn(doc);
@@ -1509,7 +1509,7 @@ export class WorkspaceWebview {
 
   /**
    * Apply the AddSkillModal draft: write the .md file at the scope-target
-   * path and (for aidlc) register it in workspace.yaml. No overwrite — if
+   * path and (for edlc) register it in workspace.yaml. No overwrite — if
    * the file already exists we surface a warning and abort. Webview's
    * `takenIds` should prevent collisions in normal use.
    */
@@ -1518,7 +1518,7 @@ export class WorkspaceWebview {
     if (!root) { return; }
     const doc = readYaml(root);
     if (!doc) {
-      void vscode.window.showWarningMessage('AIDLC: no workspace.yaml — initialize first.');
+      void vscode.window.showWarningMessage('EDLC: no workspace.yaml — initialize first.');
       return;
     }
 
@@ -1526,7 +1526,7 @@ export class WorkspaceWebview {
     const id = String(draft.id ?? '').trim();
     const sourceRaw = draft.source as Record<string, unknown> | undefined;
     if (!id || !sourceRaw) { return; }
-    if (scope !== 'project' && scope !== 'aidlc' && scope !== 'global') { return; }
+    if (scope !== 'project' && scope !== 'edlc' && scope !== 'global') { return; }
 
     let content = '';
     let openInEditor = false;
@@ -1559,9 +1559,9 @@ export class WorkspaceWebview {
     fs.mkdirSync(path.dirname(skillPath), { recursive: true });
     fs.writeFileSync(skillPath, content, 'utf8');
 
-    if (scope === 'aidlc') {
+    if (scope === 'edlc') {
       this.mutateYaml((d) => {
-        d.skills.push({ id, path: `./.aidlc/skills/${id}.md` });
+        d.skills.push({ id, path: `./.edlc/skills/${id}.md` });
       });
     }
 
@@ -1570,14 +1570,14 @@ export class WorkspaceWebview {
       await vscode.window.showTextDocument(docOpen, { preview: false });
     }
 
-    const yamlNote = scope === 'aidlc' ? ' + workspace.yaml' : '';
+    const yamlNote = scope === 'edlc' ? ' + workspace.yaml' : '';
     void vscode.window.showInformationMessage(
       `Skill "${id}" added (${scope})${yamlNote}.`,
     );
   }
 
   /**
-   * Apply the AddAgentModal draft. AIDLC scope appends to workspace.yaml
+   * Apply the AddAgentModal draft. EDLC scope appends to workspace.yaml
    * `agents:`. Project / global scopes write a Claude Code-native .md file
    * with frontmatter + the picked skills inlined as a starter prompt.
    */
@@ -1586,7 +1586,7 @@ export class WorkspaceWebview {
     if (!root) { return; }
     const doc = readYaml(root);
     if (!doc) {
-      void vscode.window.showWarningMessage('AIDLC: no workspace.yaml — initialize first.');
+      void vscode.window.showWarningMessage('EDLC: no workspace.yaml — initialize first.');
       return;
     }
 
@@ -1596,7 +1596,7 @@ export class WorkspaceWebview {
     const skillsRaw = Array.isArray(draft.skills) ? (draft.skills as unknown[]) : [];
     const skills = skillsRaw.map(String).filter((s) => s);
     if (!id || !name) { return; }
-    if (scope !== 'project' && scope !== 'aidlc' && scope !== 'global') { return; }
+    if (scope !== 'project' && scope !== 'edlc' && scope !== 'global') { return; }
 
     const yamlSkillIds = new Set(doc.skills.map((s) => String(s.id)));
     for (const s of skills) {
@@ -1614,7 +1614,7 @@ export class WorkspaceWebview {
     const capsRaw = Array.isArray(draft.capabilities) ? (draft.capabilities as unknown[]) : [];
     const capabilities = capsRaw.map(String).filter((c) => c);
 
-    if (scope === 'aidlc') {
+    if (scope === 'edlc') {
       if (!model) { return; }
       const envObj = draft.env && typeof draft.env === 'object'
         ? (draft.env as Record<string, unknown>)
@@ -1632,7 +1632,7 @@ export class WorkspaceWebview {
       });
 
       void vscode.window.showInformationMessage(
-        `Agent "${id}" added (aidlc · skills: ${skills.join(', ')}, model: ${model}).`,
+        `Agent "${id}" added (edlc · skills: ${skills.join(', ')}, model: ${model}).`,
       );
       return;
     }
@@ -1698,7 +1698,7 @@ export class WorkspaceWebview {
   /**
    * Apply the EditAgentModal draft. Supports both file-based scopes
    * (project/global — rewrite YAML frontmatter, preserve body) and the
-   * AIDLC scope (mutate workspace.yaml entry). The id is locked by the
+   * EDLC scope (mutate workspace.yaml entry). The id is locked by the
    * modal so this never has to handle renames — use `renameAgent` for that.
    */
   private async editAgentInline(draft: Record<string, unknown>): Promise<void> {
@@ -1707,7 +1707,7 @@ export class WorkspaceWebview {
 
     const id = String(draft.id ?? '').trim();
     const scope = draft.scope as AssetScope;
-    if (!id || (scope !== 'project' && scope !== 'aidlc' && scope !== 'global')) { return; }
+    if (!id || (scope !== 'project' && scope !== 'edlc' && scope !== 'global')) { return; }
 
     const name = String(draft.name ?? '').trim();
     const description = String(draft.description ?? '').trim();
@@ -1721,7 +1721,7 @@ export class WorkspaceWebview {
       ? (draft.skills as unknown[]).map(String).filter((s) => s.length > 0)
       : [];
 
-    if (scope === 'aidlc') {
+    if (scope === 'edlc') {
       this.mutateYaml((doc) => {
         const agent = doc.agents.find((a) => String(a.id) === id);
         if (!agent) { return false; }
@@ -1768,7 +1768,7 @@ export class WorkspaceWebview {
     });
     fs.writeFileSync(agentPath, updated, 'utf8');
 
-    // Persona ↔ skill binding lives in workspace.yaml's AIDLC layer (the
+    // Persona ↔ skill binding lives in workspace.yaml's EDLC layer (the
     // agent frontmatter has no `skills:` field), so write it there even
     // for file-based agents. Idempotent — creates the entry on first edit,
     // updates it thereafter.
@@ -1822,9 +1822,9 @@ export class WorkspaceWebview {
       PresetStore.applyTo(root, preset, workspaceName);
     } else {
       // workspace.yaml exists — merge preset content in without overwriting existing config.
-      // Skill content itself lives in `~/.claude/skills/aidlc-<workflow>-<phase>.md`
+      // Skill content itself lives in `~/.claude/skills/edlc-<workflow>-<phase>.md`
       // (installed by globalDefaultsInstaller), so we no longer drop a second
-      // copy under `.aidlc/skills/`.
+      // copy under `.edlc/skills/`.
 
       const existingAgentIds = new Set(doc.agents.map((a) => String(a.id)));
       const existingSkillIds = new Set(doc.skills.map((s) => String(s.id)));
@@ -1907,7 +1907,7 @@ export class WorkspaceWebview {
    * Ensure artifact templates exist for every known pipeline in this workspace.
    *
    * - SDLC (built-in): writes bundled templates from `templates/sdlc/artifacts/`
-   *   to `.aidlc/aidlc-templates/sdlc-full/` — idempotent, no file I/O if
+   *   to `.edlc/edlc-templates/sdlc-full/` — idempotent, no file I/O if
    *   files already exist.
    * - Custom pipelines: templates are generated by `generatePipelineTemplates`
    *   at pipeline-creation time; this method just ensures the directory exists.
@@ -1917,7 +1917,7 @@ export class WorkspaceWebview {
    */
   private ensureWorkflowTemplates(root: string): void {
     // For every built-in pipeline present in workspace.yaml, drop the
-    // bundled artifact templates into `.aidlc/aidlc-templates/<pipelineId>/`.
+    // bundled artifact templates into `.edlc/edlc-templates/<pipelineId>/`.
     // No special-casing — every workflow extracts on first apply, idempotent
     // on subsequent panel refreshes.
     const doc = readYaml(root);
@@ -1926,7 +1926,7 @@ export class WorkspaceWebview {
       const pId = String(p.id);
       const workflow = getBuiltinWorkflowByPipelineId(pId);
       if (!workflow) { continue; }
-      const dir = path.join(root, WORKSPACE_DIR, 'aidlc-templates', pId);
+      const dir = path.join(root, WORKSPACE_DIR, 'edlc-templates', pId);
       fs.mkdirSync(dir, { recursive: true });
       const templates = getBuiltinArtifactTemplates(this.extensionUri.fsPath, workflow);
       for (const [fileName, content] of Object.entries(templates)) {
@@ -1966,7 +1966,7 @@ export class WorkspaceWebview {
 
     const doc = readYaml(root);
     if (!doc) {
-      void vscode.window.showWarningMessage('AIDLC: no workspace.yaml — initialize first.');
+      void vscode.window.showWarningMessage('EDLC: no workspace.yaml — initialize first.');
       return;
     }
 
@@ -2016,10 +2016,10 @@ export class WorkspaceWebview {
     const artifactsDir = path.join(epicDir, 'artifacts');
     fs.mkdirSync(artifactsDir, { recursive: true });
 
-    // Copy artifact templates from .aidlc/aidlc-templates/<pipelineId>/ into
+    // Copy artifact templates from .edlc/edlc-templates/<pipelineId>/ into
     // the epic's artifacts/ folder so Claude has a structured starting point.
     if (targetKind === 'pipeline') {
-      const templatesDir = path.join(root, WORKSPACE_DIR, 'aidlc-templates', targetId);
+      const templatesDir = path.join(root, WORKSPACE_DIR, 'edlc-templates', targetId);
       if (fs.existsSync(templatesDir)) {
         for (const fileName of fs.readdirSync(templatesDir)) {
           const src = path.join(templatesDir, fileName);
@@ -2185,7 +2185,7 @@ export class WorkspaceWebview {
   /**
    * Best-effort path normalization for workspace.yaml `skills[].path`.
    * Files under the workspace get a project-relative path; absolute paths
-   * outside (e.g. `~/.claude/agents/aidlc-po.md`) keep the `~/` form so
+   * outside (e.g. `~/.claude/agents/edlc-po.md`) keep the `~/` form so
    * the YAML stays portable across machines.
    */
   private relPathFor(root: string, abs: string): string {
@@ -2200,7 +2200,7 @@ export class WorkspaceWebview {
     if (!root) { return; }
     const doc = readYaml(root);
     if (!doc) {
-      void vscode.window.showWarningMessage('AIDLC: no workspace.yaml — initialize first.');
+      void vscode.window.showWarningMessage('EDLC: no workspace.yaml — initialize first.');
       return;
     }
 
@@ -2291,7 +2291,7 @@ export class WorkspaceWebview {
    * Use the local `claude` CLI (already authenticated) to generate a per-step
    * artifact template for a custom pipeline. Reads each step's agent description
    * + linked skill content, passes it to `claude -p` and writes the result to
-   * `.aidlc/aidlc-templates/<pipelineId>/<stepAgent>.md`.
+   * `.edlc/edlc-templates/<pipelineId>/<stepAgent>.md`.
    *
    * Runs asynchronously after the pipeline is saved — failures are surfaced as
    * a VS Code warning rather than blocking the pipeline creation flow.
@@ -2304,7 +2304,7 @@ export class WorkspaceWebview {
     const doc = readYaml(root);
     if (!doc) { return; }
 
-    const templatesDir = path.join(root, WORKSPACE_DIR, 'aidlc-templates', pipelineId);
+    const templatesDir = path.join(root, WORKSPACE_DIR, 'edlc-templates', pipelineId);
     fs.mkdirSync(templatesDir, { recursive: true });
 
     await vscode.window.withProgress(
@@ -2375,7 +2375,7 @@ export class WorkspaceWebview {
     );
 
     void vscode.window.showInformationMessage(
-      `Artifact templates ready at .aidlc/aidlc-templates/${pipelineId}/`,
+      `Artifact templates ready at .edlc/edlc-templates/${pipelineId}/`,
     );
   }
 
@@ -2633,7 +2633,7 @@ export class WorkspaceWebview {
         'Add Agent',
       );
       if (choice === 'Add Agent') {
-        await vscode.commands.executeCommand('aidlc.addAgent');
+        await vscode.commands.executeCommand('edlc.addAgent');
       }
       return;
     }
@@ -2889,7 +2889,7 @@ export class WorkspaceWebview {
     if (!root) { return; }
     const doc = readYaml(root);
     if (!doc) {
-      void vscode.window.showWarningMessage('AIDLC: no workspace.yaml found.');
+      void vscode.window.showWarningMessage('EDLC: no workspace.yaml found.');
       return;
     }
     const pipeline = (doc.pipelines as PipelineConfig[] | undefined)?.find((p) => p.id === pipelineId);
@@ -2961,14 +2961,14 @@ export class WorkspaceWebview {
            font-src ${cspSource} https: data:;
            style-src ${cspSource} 'unsafe-inline';
            script-src 'nonce-${nonce}' ${cspSource};">
-<title>AIDLC Workspace</title>
+<title>EDLC Workspace</title>
 <link rel="stylesheet" href="${cssUri}">
 </head>
 <body>
 <div id="app"></div>
 <script nonce="${nonce}">
-window.__AIDLC_INITIAL_STATE__ = ${JSON.stringify(initialState)};
-window.__AIDLC_INITIAL_THEME__ = ${JSON.stringify(initialTheme)};
+window.__EDLC_INITIAL_STATE__ = ${JSON.stringify(initialState)};
+window.__EDLC_INITIAL_THEME__ = ${JSON.stringify(initialTheme)};
 </script>
 <script type="module" nonce="${nonce}" src="${entryUri}"></script>
 </body>

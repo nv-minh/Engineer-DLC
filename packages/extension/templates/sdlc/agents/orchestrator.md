@@ -71,7 +71,7 @@ You are always passed a `workspace` (absolute path to the user's project) in you
        - If context.humanGate == true and skip_gates == false:
            set_phase_status(workspace, epic_id, phase, "awaiting_human_review", verdict)
            Output: "🔔 phase <phase> done, awaiting human review (open the
-           aidlc sidebar to approve or reject)."
+           edlc sidebar to approve or reject)."
            STOP.
        - Else:
            set_phase_status(workspace, epic_id, phase, "passed", verdict)

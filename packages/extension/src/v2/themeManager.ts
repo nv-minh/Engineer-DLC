@@ -9,7 +9,7 @@
 
 import * as vscode from 'vscode';
 
-const THEME_PERSIST_KEY = 'aidlc.themeOverride';
+const THEME_PERSIST_KEY = 'edlc.themeOverride';
 
 export type ThemeMode = 'auto' | 'light' | 'dark';
 

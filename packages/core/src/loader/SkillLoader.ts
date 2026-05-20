@@ -2,7 +2,7 @@
  * Loads skill markdown content, resolving the `id → string` mapping declared
  * in workspace.yaml. Two sources:
  *
- *   1. **Builtin skills** — bundled with @aidlc/core. Phase 1 ships with no
+ *   1. **Builtin skills** — bundled with @edlc/core. Phase 1 ships with no
  *      builtin skills (registry empty); Phase 2+ will populate from a
  *      `skills/builtin/<id>.md` directory inside this package.
  *   2. **Custom skills** — user's local `.md` file referenced by `path`,
@@ -40,7 +40,7 @@ export class SkillNotFoundError extends Error {
 export interface SkillLoaderOptions {
   /**
    * Map of builtin skill id → file path (absolute or relative to this package).
-   * Phase 1: empty by default. Phase 2+ wires the `@aidlc/core/skills/builtin/*`
+   * Phase 1: empty by default. Phase 2+ wires the `@edlc/core/skills/builtin/*`
    * directory in here at construction time.
    */
   builtins?: Record<string, string>;

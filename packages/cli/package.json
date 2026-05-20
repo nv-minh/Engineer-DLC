@@ -1,18 +1,18 @@
 {
-  "name": "aidlc",
+  "name": "edlc",
   "version": "0.1.0",
-  "description": "AIDLC terminal CLI — drive workspace.yaml pipelines with Claude from any terminal.",
+  "description": "EDLC terminal CLI — drive workspace.yaml pipelines with Claude from any terminal.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aidlc-io/aidlc"
+    "url": "https://github.com/nv-minh/edlc"
   },
-  "homepage": "https://github.com/aidlc-io/aidlc#readme",
+  "homepage": "https://github.com/nv-minh/edlc#readme",
   "bugs": {
-    "url": "https://github.com/aidlc-io/aidlc/issues"
+    "url": "https://github.com/nv-minh/edlc/issues"
   },
   "keywords": [
-    "aidlc",
+    "edlc",
     "claude",
     "ai",
     "workflow",
@@ -25,7 +25,7 @@
   },
   "main": "./dist/bundle.js",
   "bin": {
-    "aidlc": "./dist/bundle.js"
+    "edlc": "./dist/bundle.js"
   },
   "files": [
     "dist/bundle.js",
@@ -43,7 +43,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@aidlc/core": "workspace:*",
+    "@edlc/core": "workspace:*",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
     "chalk": "^4.1.2",

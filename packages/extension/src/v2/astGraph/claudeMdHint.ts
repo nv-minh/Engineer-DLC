@@ -13,8 +13,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const MARKER_START = '<!-- aidlc:ast-graph:start -->';
-const MARKER_END = '<!-- aidlc:ast-graph:end -->';
+const MARKER_START = '<!-- edlc:ast-graph:start -->';
+const MARKER_END = '<!-- edlc:ast-graph:end -->';
 
 /**
  * Ensure the ast-graph hint block exists in `<folder>/.claude/CLAUDE.md`.
@@ -94,10 +94,10 @@ function buildBlock(): string {
   // because CLAUDE.md is loaded on every session and we don't want to
   // tax the context budget for marginal hint detail.
   return `${MARKER_START}
-## ast-graph (managed by AIDLC extension — do not edit by hand)
+## ast-graph (managed by EDLC extension — do not edit by hand)
 
 This project has a pre-built AST graph at \`.ast-graph/graph.db\`, exposed via the
-\`ast-graph\` MCP server (auto-registered by the AIDLC VS Code extension). The
+\`ast-graph\` MCP server (auto-registered by the EDLC VS Code extension). The
 graph stores every function/class/method/import in the codebase plus their
 caller→callee edges, so structural questions can be answered without grepping.
 
@@ -119,7 +119,7 @@ Keep using grep/read/edit for:
 - editing or refactoring code
 - following intent, naming, or non-AST signals (config files, prose)
 
-If the graph looks stale, ask the user to run \`AIDLC: Rescan AST Graph\`. The
+If the graph looks stale, ask the user to run \`EDLC: Rescan AST Graph\`. The
 extension also rescans automatically a few seconds after any source file save.
 ${MARKER_END}`;
 }

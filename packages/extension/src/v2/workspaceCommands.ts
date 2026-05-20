@@ -1,8 +1,8 @@
 /**
  * Workspace commands exposed by the extension host:
- *   aidlc.showWorkspaceConfig — load .aidlc/workspace.yaml + dump parsed config
+ *   edlc.showWorkspaceConfig — load .edlc/workspace.yaml + dump parsed config
  *                               to the Output channel.
- *   aidlc.initWorkspace       — scaffold a starter workspace.yaml + sample
+ *   edlc.initWorkspace       — scaffold a starter workspace.yaml + sample
  *                               skill so the user has something to load.
  */
 
@@ -19,7 +19,7 @@ import {
   WORKSPACE_DIR,
   WORKSPACE_FILENAME,
   stepAgentId,
-} from '@aidlc/core';
+} from '@edlc/core';
 
 import {
   addSkillCommand,
@@ -53,7 +53,7 @@ import {
 } from './runCommands';
 
 /**
- * Sentinel `workflowId` value that `aidlc.initWorkspace` accepts to mean
+ * Sentinel `workflowId` value that `edlc.initWorkspace` accepts to mean
  * "scaffold an empty workspace, no preset". Used by the webview's
  * InitWorkflowModal — it sends this when the user picks the Empty option,
  * so the host knows to skip the native QuickPick (since the React modal
@@ -94,54 +94,54 @@ export function registerV2WorkspaceCommands(
   output: vscode.OutputChannel,
 ): { disposables: vscode.Disposable[]; presetStore: PresetStore } {
   const showCmd = vscode.commands.registerCommand(
-    'aidlc.showWorkspaceConfig',
+    'edlc.showWorkspaceConfig',
     () => showWorkspaceConfig(output),
   );
 
   const initCmd = vscode.commands.registerCommand(
-    'aidlc.initWorkspace',
+    'edlc.initWorkspace',
     (workflowId?: unknown) =>
       initWorkspace(output, context, typeof workflowId === 'string' ? workflowId : undefined),
   );
 
   const openGettingStartedCmd = vscode.commands.registerCommand(
-    'aidlc.openGettingStarted',
+    'edlc.openGettingStarted',
     () => openGettingStartedGuide(context),
   );
 
   const addSkillCmd = vscode.commands.registerCommand(
-    'aidlc.addSkill',
+    'edlc.addSkill',
     () => addSkillCommand(),
   );
 
   const addAgentCmd = vscode.commands.registerCommand(
-    'aidlc.addAgent',
+    'edlc.addAgent',
     () => addAgentCommand(),
   );
 
   const addPipelineCmd = vscode.commands.registerCommand(
-    'aidlc.addPipeline',
+    'edlc.addPipeline',
     () => addPipelineCommand(),
   );
 
   const openBuilderCmd = vscode.commands.registerCommand(
-    'aidlc.openBuilder',
+    'edlc.openBuilder',
     () => WorkspaceWebview.show(context.extensionUri, 'builder'),
   );
 
   // Preset library — single store instance shared across all preset commands
-  // and the Builder panel. User templates live in `<project>/.aidlc/templates/`
+  // and the Builder panel. User templates live in `<project>/.edlc/templates/`
   // (project-scoped, committable). Built-ins are loaded from the extension.
   const presetStore = new PresetStore();
   presetStore.setBuiltinLoader(() => loadAllBuiltinPresets(context.extensionPath));
 
   const savePresetCmd = vscode.commands.registerCommand(
-    'aidlc.savePreset',
+    'edlc.savePreset',
     () => savePresetCommand(presetStore),
   );
 
   const savePresetInlineCmd = vscode.commands.registerCommand(
-    'aidlc.savePresetInline',
+    'edlc.savePresetInline',
     (draft?: unknown) => {
       if (!draft || typeof draft !== 'object') { return; }
       const d = draft as Record<string, unknown>;
@@ -154,7 +154,7 @@ export function registerV2WorkspaceCommands(
   );
 
   const applyPresetCmd = vscode.commands.registerCommand(
-    'aidlc.applyPreset',
+    'edlc.applyPreset',
     (presetId?: unknown, skipConfirm?: unknown) =>
       applyPresetCommand(
         presetStore,
@@ -165,26 +165,26 @@ export function registerV2WorkspaceCommands(
   );
 
   const deletePresetCmd = vscode.commands.registerCommand(
-    'aidlc.deletePreset',
+    'edlc.deletePreset',
     () => deletePresetCommand(presetStore),
   );
 
   const installWorkflowGlobalsCmd = vscode.commands.registerCommand(
-    'aidlc.installWorkflowGlobals',
+    'edlc.installWorkflowGlobals',
     () => installWorkflowGlobalsCommand(context.extensionPath, output),
   );
 
   const uninstallWorkflowGlobalsCmd = vscode.commands.registerCommand(
-    'aidlc.uninstallWorkflowGlobals',
+    'edlc.uninstallWorkflowGlobals',
     () => uninstallWorkflowGlobalsCommand(context.extensionPath, output),
   );
 
   const migrateEpicsCmd = vscode.commands.registerCommand(
-    'aidlc.migrateEpics',
+    'edlc.migrateEpics',
     async () => {
       const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!root) {
-        void vscode.window.showWarningMessage('AIDLC: open a project folder first.');
+        void vscode.window.showWarningMessage('EDLC: open a project folder first.');
         return;
       }
       const report = migrateEpicStateFiles(root);
@@ -202,10 +202,10 @@ export function registerV2WorkspaceCommands(
         parts.push(`${report.errors.length} error(s)`);
       }
       if (parts.length === 0) {
-        void vscode.window.showInformationMessage('AIDLC: no epics to migrate.');
+        void vscode.window.showInformationMessage('EDLC: no epics to migrate.');
         return;
       }
-      const summary = `AIDLC migration — ${parts.join(', ')}.`;
+      const summary = `EDLC migration — ${parts.join(', ')}.`;
       const blockers: string[] = [];
       const skippedByReason = new Map<string, string[]>();
       for (const s of report.skipped) {
@@ -237,22 +237,22 @@ export function registerV2WorkspaceCommands(
   );
 
   const startEpicCmd = vscode.commands.registerCommand(
-    'aidlc.startEpic',
+    'edlc.startEpic',
     () => startEpicCommand(),
   );
 
   const openEpicsListCmd = vscode.commands.registerCommand(
-    'aidlc.openEpicsList',
+    'edlc.openEpicsList',
     () => WorkspaceWebview.show(context.extensionUri, 'epics'),
   );
 
   const insertDemoEpicCmd = vscode.commands.registerCommand(
-    'aidlc.insertDemoEpic',
+    'edlc.insertDemoEpic',
     () => insertDemoEpicCommand(),
   );
 
   const loadDemoProjectCmd = vscode.commands.registerCommand(
-    'aidlc.loadDemoProject',
+    'edlc.loadDemoProject',
     (mode?: unknown) =>
       loadDemoProjectCommand(
         mode === 'reseed' || mode === 'open-as-is' ? mode : undefined,
@@ -275,7 +275,7 @@ export function registerV2WorkspaceCommands(
    * non-empty `feedback` field (cascade reject blame OR rerun feedback).
    *
    * Two paths:
-   * 1. AIDLC · Claude terminal already exists → assume `claude` is running
+   * 1. EDLC · Claude terminal already exists → assume `claude` is running
    *    in the REPL (most common case — we created it earlier and the user
    *    didn't kill it). `terminal.sendText(prompt, false)` types the
    *    prompt into the REPL with NO trailing newline so the user reviews
@@ -293,7 +293,7 @@ export function registerV2WorkspaceCommands(
    * doesn't recognize them produces a confusing error.
    */
   const runWithFeedbackCmd = vscode.commands.registerCommand(
-    'aidlc.runStepWithFeedback',
+    'edlc.runStepWithFeedback',
     (slashCommand?: unknown, runId?: unknown, feedback?: unknown) => {
       const slash = typeof slashCommand === 'string' ? slashCommand.trim() : '';
       const id = typeof runId === 'string' ? runId.trim() : '';
@@ -304,7 +304,7 @@ export function registerV2WorkspaceCommands(
         ? `${slash} ${id} — Update artifact per feedback: "${fb.replace(/"/g, '\\"')}"`
         : `${slash} ${id}`;
 
-      const TERMINAL_NAME = 'AIDLC · Claude';
+      const TERMINAL_NAME = 'EDLC · Claude';
       const existing = vscode.window.terminals.find((t) => t.name === TERMINAL_NAME);
       if (existing) {
         existing.show(false);
@@ -353,9 +353,9 @@ export function registerV2WorkspaceCommands(
   );
 
   const openClaudeTerminalCmd = vscode.commands.registerCommand(
-    'aidlc.openClaudeTerminal',
+    'edlc.openClaudeTerminal',
     () => {
-      const TERMINAL_NAME = 'AIDLC · Claude';
+      const TERMINAL_NAME = 'EDLC · Claude';
       const existing = vscode.window.terminals.find((t) => t.name === TERMINAL_NAME);
       if (existing) { existing.show(false); return; }
       const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -406,43 +406,43 @@ export function registerV2WorkspaceCommands(
 
   // Pipeline run commands (phase 1 orchestrator).
   const startRunCmd = vscode.commands.registerCommand(
-    'aidlc.startPipelineRun',
+    'edlc.startPipelineRun',
     (pipelineId?: unknown) =>
       startPipelineRunCommand(typeof pipelineId === 'string' ? pipelineId : undefined),
   );
   const toStepIdx = (v: unknown): number | undefined =>
     typeof v === 'number' && Number.isInteger(v) ? v : undefined;
   const markStepDoneCmd = vscode.commands.registerCommand(
-    'aidlc.markStepDone',
+    'edlc.markStepDone',
     (runId?: unknown, stepIdx?: unknown) =>
       markStepDoneCommand(typeof runId === 'string' ? runId : undefined, toStepIdx(stepIdx)),
   );
   const approveStepCmd = vscode.commands.registerCommand(
-    'aidlc.approveStep',
+    'edlc.approveStep',
     (runId?: unknown, stepIdx?: unknown) =>
       approveStepCommand(typeof runId === 'string' ? runId : undefined, toStepIdx(stepIdx)),
   );
   const rejectStepCmd = vscode.commands.registerCommand(
-    'aidlc.rejectStep',
+    'edlc.rejectStep',
     (runId?: unknown, stepIdx?: unknown) =>
       rejectStepCommand(typeof runId === 'string' ? runId : undefined, toStepIdx(stepIdx)),
   );
   const rerunStepCmd = vscode.commands.registerCommand(
-    'aidlc.rerunStep',
+    'edlc.rerunStep',
     (runId?: unknown, stepIdx?: unknown) =>
       rerunStepCommand(typeof runId === 'string' ? runId : undefined, toStepIdx(stepIdx)),
   );
   const runAutoReviewCmd = vscode.commands.registerCommand(
-    'aidlc.runAutoReview',
+    'edlc.runAutoReview',
     (runId?: unknown, stepIdx?: unknown) =>
       runAutoReviewCommand(typeof runId === 'string' ? runId : undefined, toStepIdx(stepIdx)),
   );
   const openRunStateCmd = vscode.commands.registerCommand(
-    'aidlc.openRunState',
+    'edlc.openRunState',
     (runId?: unknown) => openRunStateCommand(typeof runId === 'string' ? runId : undefined),
   );
   const deleteRunCmd = vscode.commands.registerCommand(
-    'aidlc.deleteRun',
+    'edlc.deleteRun',
     (runId?: unknown, skipConfirm?: unknown) =>
       deleteRunCommand(
         typeof runId === 'string' ? runId : undefined,
@@ -500,7 +500,7 @@ function requireWorkspaceRoot(): string | undefined {
   const root = getWorkspaceRoot();
   if (!root) {
     void vscode.window.showWarningMessage(
-      'AIDLC: Open a project first — this command targets the currently active workspace folder.',
+      'EDLC: Open a project first — this command targets the currently active workspace folder.',
     );
     return undefined;
   }
@@ -572,7 +572,7 @@ async function showWorkspaceConfig(output: vscode.OutputChannel): Promise<void> 
 
     output.show(true);
     void vscode.window.showInformationMessage(
-      `AIDLC workspace loaded: ${loaded.config.agents.length} agent(s), ${loaded.config.skills.length} skill(s).`,
+      `EDLC workspace loaded: ${loaded.config.agents.length} agent(s), ${loaded.config.skills.length} skill(s).`,
     );
   } catch (err) {
     handleLoadError(err, output);
@@ -583,12 +583,12 @@ function handleLoadError(err: unknown, output: vscode.OutputChannel): void {
   if (err instanceof WorkspaceNotFoundError) {
     void vscode.window
       .showWarningMessage(
-        `No \`.aidlc/${WORKSPACE_FILENAME}\` found. Initialize one?`,
+        `No \`.edlc/${WORKSPACE_FILENAME}\` found. Initialize one?`,
         'Initialize',
       )
       .then((choice) => {
         if (choice === 'Initialize') {
-          void vscode.commands.executeCommand('aidlc.initWorkspace');
+          void vscode.commands.executeCommand('edlc.initWorkspace');
         }
       });
     return;
@@ -603,18 +603,18 @@ function handleLoadError(err: unknown, output: vscode.OutputChannel): void {
     }
     output.show(true);
     void vscode.window.showErrorMessage(
-      'AIDLC workspace.yaml has validation errors. See AIDLC output channel.',
+      'EDLC workspace.yaml has validation errors. See EDLC output channel.',
     );
     return;
   }
   if (err instanceof WorkspaceParseError) {
-    void vscode.window.showErrorMessage(`AIDLC: ${err.message}`);
+    void vscode.window.showErrorMessage(`EDLC: ${err.message}`);
     return;
   }
   const msg = err instanceof Error ? err.message : String(err);
   output.appendLine(`✗ Unexpected error: ${msg}`);
   output.show(true);
-  void vscode.window.showErrorMessage(`AIDLC: failed to load workspace — ${msg}`);
+  void vscode.window.showErrorMessage(`EDLC: failed to load workspace — ${msg}`);
 }
 
 async function initWorkspace(
@@ -632,8 +632,8 @@ async function initWorkspace(
   const root = requireWorkspaceRoot();
   if (!root) { return; }
 
-  const aidlcDir = path.join(root, WORKSPACE_DIR);
-  const workspaceFile = path.join(aidlcDir, WORKSPACE_FILENAME);
+  const edlcDir = path.join(root, WORKSPACE_DIR);
+  const workspaceFile = path.join(edlcDir, WORKSPACE_FILENAME);
 
   if (fs.existsSync(workspaceFile)) {
     const choice = await vscode.window.showWarningMessage(
@@ -678,7 +678,7 @@ async function initWorkspace(
       },
     ];
     const picked = await vscode.window.showQuickPick(picks, {
-      title: 'Initialize AIDLC workspace',
+      title: 'Initialize EDLC workspace',
       placeHolder: 'Pick a starting workflow (or start empty)',
       ignoreFocusOut: true,
       matchOnDetail: true,
@@ -693,15 +693,15 @@ async function initWorkspace(
     // and writes workspace.yaml + .claude/commands/*. `skipConfirm: true`
     // because the user already confirmed at the overwrite prompt above
     // (or there was no existing file).
-    await vscode.commands.executeCommand('aidlc.applyPreset', chosenWorkflowId, true);
-    void vscode.commands.executeCommand('aidlc.openBuilder');
+    await vscode.commands.executeCommand('edlc.applyPreset', chosenWorkflowId, true);
+    void vscode.commands.executeCommand('edlc.openBuilder');
     openGettingStartedGuide(context);
     return;
   }
   void chosenEmpty;
 
   try {
-    fs.mkdirSync(aidlcDir, { recursive: true });
+    fs.mkdirSync(edlcDir, { recursive: true });
     const workspaceName = vscode.workspace.workspaceFolders?.[0]?.name
       ?? path.basename(root);
     fs.writeFileSync(workspaceFile, sampleWorkspaceYaml(workspaceName), 'utf8');
@@ -709,12 +709,12 @@ async function initWorkspace(
 
     void vscode.window
       .showInformationMessage(
-        'AIDLC workspace initialized at .aidlc/. Open Builder?',
+        'EDLC workspace initialized at .edlc/. Open Builder?',
         'Open Builder',
       )
       .then((choice) => {
         if (choice === 'Open Builder') {
-          void vscode.commands.executeCommand('aidlc.openBuilder');
+          void vscode.commands.executeCommand('edlc.openBuilder');
         }
       });
     // Open the new workspace.yaml so the user can edit it
@@ -723,7 +723,7 @@ async function initWorkspace(
     openGettingStartedGuide(context);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    void vscode.window.showErrorMessage(`AIDLC init failed: ${msg}`);
+    void vscode.window.showErrorMessage(`EDLC init failed: ${msg}`);
   }
 }
 
@@ -737,7 +737,7 @@ function openGettingStartedGuide(context: vscode.ExtensionContext): void {
   const guidePath = path.join(context.extensionPath, 'media', 'getting-started.md');
   if (!fs.existsSync(guidePath)) {
     void vscode.window.showWarningMessage(
-      `AIDLC: getting-started guide not found at ${guidePath}.`,
+      `EDLC: getting-started guide not found at ${guidePath}.`,
     );
     return;
   }

@@ -1,11 +1,11 @@
 /**
- * `aidlc.savePreset` and `aidlc.applyPreset` wizards.
+ * `edlc.savePreset` and `edlc.applyPreset` wizards.
  *
  *   savePreset  — capture the current project's workspace.yaml + skill .md
  *                 into a globalStorage preset. Prompts for name/description.
  *
  *   applyPreset — pick from saved presets and scaffold the current project's
- *                 .aidlc/ from it. Confirms before overwriting any file
+ *                 .edlc/ from it. Confirms before overwriting any file
  *                 that already exists.
  *
  * Both commands target the *active* workspace folder. They warn (not pick a
@@ -40,7 +40,7 @@ function requireRoot(action: string): string | undefined {
   const root = getRoot();
   if (!root) {
     void vscode.window.showWarningMessage(
-      `AIDLC: Open a project first — ${action} targets the active workspace folder.`,
+      `EDLC: Open a project first — ${action} targets the active workspace folder.`,
     );
     return undefined;
   }
@@ -56,7 +56,7 @@ export async function savePresetCommand(store: PresetStore): Promise<void> {
   const doc = readYaml(root);
   if (!doc) {
     void vscode.window.showWarningMessage(
-      'AIDLC: No .aidlc/workspace.yaml in this project — initialize one before saving as a preset.',
+      'EDLC: No .edlc/workspace.yaml in this project — initialize one before saving as a preset.',
     );
     return;
   }
@@ -159,7 +159,7 @@ export async function applyPresetCommand(
       'Init Sample Workspace',
     );
     if (choice === 'Init Sample Workspace') {
-      void vscode.commands.executeCommand('aidlc.initWorkspace');
+      void vscode.commands.executeCommand('edlc.initWorkspace');
     }
     return;
   }
@@ -169,7 +169,7 @@ export async function applyPresetCommand(
     preset = presets.find((p) => p.id === presetId);
     if (!preset) {
       void vscode.window.showWarningMessage(
-        `AIDLC: template \`${presetId}\` not found. It may have been deleted.`,
+        `EDLC: template \`${presetId}\` not found. It may have been deleted.`,
       );
       return;
     }
@@ -202,7 +202,7 @@ export async function applyPresetCommand(
     );
     if (choice !== 'Install') {
       void vscode.window.showInformationMessage(
-        'AIDLC: apply cancelled. Run "AIDLC: Install Workflow Globals" later to install on demand.',
+        'EDLC: apply cancelled. Run "EDLC: Install Workflow Globals" later to install on demand.',
       );
       return;
     }
@@ -229,7 +229,7 @@ export async function applyPresetCommand(
     result = PresetStore.applyTo(root, preset, workspaceName, { overwrite: false });
   } else {
     mergeReport = mergePresetIntoYaml(root, existing, preset);
-    result = { written: mergeReport.changed ? [path.join(root, '.aidlc', 'workspace.yaml')] : [], skipped: [] };
+    result = { written: mergeReport.changed ? [path.join(root, '.edlc', 'workspace.yaml')] : [], skipped: [] };
   }
 
   // Stamp the detected tech stack into workspace.yaml so subsequent
@@ -269,7 +269,7 @@ export async function applyPresetCommand(
     )
     .then((choice) => {
       if (choice === 'Open Builder') {
-        void vscode.commands.executeCommand('aidlc.openBuilder');
+        void vscode.commands.executeCommand('edlc.openBuilder');
       }
     });
 }
@@ -326,7 +326,7 @@ export async function savePresetInlineCommand(
   const doc = readYaml(root);
   if (!doc) {
     void vscode.window.showWarningMessage(
-      'AIDLC: No .aidlc/workspace.yaml in this project — initialize one before saving as a template.',
+      'EDLC: No .edlc/workspace.yaml in this project — initialize one before saving as a template.',
     );
     return;
   }
@@ -494,7 +494,7 @@ function ensureTechStackInYaml(root: string): void {
   const comment =
     '# tech_stack drives template filtering for built-in workflows. Edit\n' +
     '# this list (web | mobile | desktop | backend | cli) and re-apply the\n' +
-    '# preset to refresh ~/.claude/skills/aidlc-*.md with only the sections\n' +
+    '# preset to refresh ~/.claude/skills/edlc-*.md with only the sections\n' +
     '# that match your project.\n';
   const line = `tech_stack: [${detected.join(', ')}]\n`;
   fs.writeFileSync(yamlPath, body + trailing + comment + line, 'utf8');

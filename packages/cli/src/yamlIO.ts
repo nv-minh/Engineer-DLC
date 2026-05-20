@@ -1,5 +1,5 @@
 /**
- * CLI-side YAML I/O for `.aidlc/workspace.yaml`.
+ * CLI-side YAML I/O for `.edlc/workspace.yaml`.
  * Ported from packages/extension/src/v2/yamlIO.ts — zero vscode dependency.
  * Atomic write: dump to <file>.tmp + rename.
  */
@@ -7,7 +7,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
-import { WORKSPACE_DIR, WORKSPACE_FILENAME } from '@aidlc/core';
+import { WORKSPACE_DIR, WORKSPACE_FILENAME } from '@edlc/core';
 
 export interface YamlDocument {
   version: string;
@@ -43,7 +43,7 @@ function normalize(doc: Record<string, unknown>): YamlDocument {
   return {
     ...doc,
     version:       typeof doc.version === 'string' ? doc.version : '1.0',
-    name:          typeof doc.name    === 'string' ? doc.name    : 'AIDLC Workspace',
+    name:          typeof doc.name    === 'string' ? doc.name    : 'EDLC Workspace',
     agents:        Array.isArray(doc.agents)        ? (doc.agents        as Array<Record<string, unknown>>) : [],
     skills:        Array.isArray(doc.skills)        ? (doc.skills        as Array<Record<string, unknown>>) : [],
     environment:   (doc.environment && typeof doc.environment === 'object'
@@ -89,7 +89,7 @@ export function existingIds(items: Array<Record<string, unknown>>): Set<string> 
 export function requireYaml(root: string): YamlDocument {
   const doc = readYaml(root);
   if (!doc) {
-    console.error(`No .aidlc/workspace.yaml found at ${root}. Run: aidlc init`);
+    console.error(`No .edlc/workspace.yaml found at ${root}. Run: edlc init`);
     process.exit(1);
   }
   return doc;

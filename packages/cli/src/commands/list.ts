@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { WorkspaceLoader, stepAgentId } from '@aidlc/core';
+import { WorkspaceLoader, stepAgentId } from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 
 export function registerList(program: Command): void {

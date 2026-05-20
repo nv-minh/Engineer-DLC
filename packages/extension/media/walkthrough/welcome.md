@@ -1,16 +1,16 @@
-# What is AIDLC?
+# What is EDLC?
 
-A single `workspace.yaml` declares your **agents**, **skills**, and **pipelines** — AIDLC turns it into a runnable workflow you drive from VS Code or the terminal.
+A single `workspace.yaml` declares your **agents**, **skills**, and **pipelines** — EDLC turns it into a runnable workflow you drive from VS Code or the terminal.
 
 ```
-.aidlc/
+.edlc/
 ├── workspace.yaml      # agents · skills · pipelines · sidebar layout
 ├── skills/             # markdown prompts for each skill
 ├── epics/              # work items bound to a pipeline
 └── runs/               # state of every run, watched live
 ```
 
-Both the extension and the `aidlc` CLI read and write the same files — switch between them mid-run.
+Both the extension and the `edlc` CLI read and write the same files — switch between them mid-run.
 
 ---
 
@@ -22,4 +22,4 @@ This walkthrough takes ~2 minutes:
 4. **Open the Claude terminal** — drive runs from the CLI
 5. **Build your own** — scaffold, add agents, save as a template
 
-> Already know AIDLC? Skip ahead — each step has a button that runs the right command.
+> Already know EDLC? Skip ahead — each step has a button that runs the right command.

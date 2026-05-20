@@ -115,7 +115,7 @@ describe('WorkspaceSchema', () => {
                 requires: ['PRD.md'],
                 produces: ['TECH-DESIGN.md'],
                 auto_review: true,
-                auto_review_runner: '.aidlc/scripts/check-design.mjs',
+                auto_review_runner: '.edlc/scripts/check-design.mjs',
                 human_review: false,
               },
             ],
@@ -127,7 +127,7 @@ describe('WorkspaceSchema', () => {
     const step = config.pipelines[0].steps[1];
     if (typeof step === 'string') { throw new Error('expected object form'); }
     expect(step.auto_review).toBe(true);
-    expect(step.auto_review_runner).toBe('.aidlc/scripts/check-design.mjs');
+    expect(step.auto_review_runner).toBe('.edlc/scripts/check-design.mjs');
     expect(step.enabled).toBe(true); // default
   });
 

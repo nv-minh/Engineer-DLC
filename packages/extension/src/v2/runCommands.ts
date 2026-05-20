@@ -1,22 +1,22 @@
 /**
  * Pipeline run commands — phase 1 of the v2 orchestrator.
  *
- *   aidlc.startPipelineRun  — pick a pipeline, prompt for a run id, scaffold
+ *   edlc.startPipelineRun  — pick a pipeline, prompt for a run id, scaffold
  *                             the run JSON, and open step 0 in awaiting_work.
- *   aidlc.markStepDone      — validate the current step's `produces` exist,
+ *   edlc.markStepDone      — validate the current step's `produces` exist,
  *                             then transition to awaiting_review (or auto-
  *                             approve when human_review=false).
- *   aidlc.approveStep       — human approves the awaiting_review step.
- *   aidlc.rejectStep        — human rejects with optional reason.
- *   aidlc.rerunStep         — retry a rejected step (revision++).
- *   aidlc.openRunState      — open the run JSON in the editor.
- *   aidlc.deleteRun         — remove the run file (confirms first).
+ *   edlc.approveStep       — human approves the awaiting_review step.
+ *   edlc.rejectStep        — human rejects with optional reason.
+ *   edlc.rerunStep         — retry a rejected step (revision++).
+ *   edlc.openRunState      — open the run JSON in the editor.
+ *   edlc.deleteRun         — remove the run file (confirms first).
  *
  * All run-mutating commands resolve the active runId via:
  *   1. explicit argument from the sidebar click
- *   2. otherwise, quick-pick over runs in `.aidlc/runs/` filtered by relevance
+ *   2. otherwise, quick-pick over runs in `.edlc/runs/` filtered by relevance
  *
- * The state machine itself lives in @aidlc/core/runs — these wrappers
+ * The state machine itself lives in @edlc/core/runs — these wrappers
  * only do VS Code-flavored UX (pickers, prompts, toasts) and persist the
  * resulting state.
  */
@@ -37,8 +37,8 @@ import {
   runAutoReview,
   PipelineRunError,
   AutoReviewerError,
-} from '@aidlc/core';
-import type { PipelineConfig, RunState } from '@aidlc/core';
+} from '@edlc/core';
+import type { PipelineConfig, RunState } from '@edlc/core';
 
 import { readYaml } from './yamlIO';
 import { mirrorRunStateToEpic } from './epicsList';
@@ -56,7 +56,7 @@ function saveRun(workspaceRoot: string, next: RunState): void {
     mirrorRunStateToEpic(workspaceRoot, next, readYaml(workspaceRoot));
   } catch (err) {
     void vscode.window.showWarningMessage(
-      `AIDLC: failed to mirror run state into epic state.json — ${err instanceof Error ? err.message : String(err)}`,
+      `EDLC: failed to mirror run state into epic state.json — ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 }
@@ -69,7 +69,7 @@ function requireRoot(action: string): string | undefined {
   const root = getRoot();
   if (!root) {
     void vscode.window.showWarningMessage(
-      `AIDLC: Open a project first — ${action} targets the active workspace folder.`,
+      `EDLC: Open a project first — ${action} targets the active workspace folder.`,
     );
     return undefined;
   }
@@ -96,7 +96,7 @@ async function resolveRunId(
   if (explicit) { return explicit; }
   const runs = RunStateStore.list(root).filter(filter);
   if (runs.length === 0) {
-    void vscode.window.showInformationMessage('AIDLC: no matching pipeline runs.');
+    void vscode.window.showInformationMessage('EDLC: no matching pipeline runs.');
     return undefined;
   }
   if (runs.length === 1) { return runs[0].runId; }
@@ -139,7 +139,7 @@ export async function startPipelineRunInlineCommand(
 
   const doc = readYaml(root);
   if (!doc || !Array.isArray(doc.pipelines)) {
-    void vscode.window.showWarningMessage('AIDLC: no workspace.yaml or no pipelines defined.');
+    void vscode.window.showWarningMessage('EDLC: no workspace.yaml or no pipelines defined.');
     return;
   }
   const pipeline = (doc.pipelines as PipelineConfig[]).find((p) => p.id === id);
@@ -173,7 +173,7 @@ export async function startPipelineRunCommand(pipelineIdArg?: string): Promise<v
   const doc = readYaml(root);
   if (!doc || !doc.pipelines || doc.pipelines.length === 0) {
     void vscode.window.showWarningMessage(
-      'AIDLC: no pipelines defined in workspace.yaml. Add one with id + steps[] first.',
+      'EDLC: no pipelines defined in workspace.yaml. Add one with id + steps[] first.',
     );
     return;
   }
@@ -183,7 +183,7 @@ export async function startPipelineRunCommand(pipelineIdArg?: string): Promise<v
     const found = (doc.pipelines as PipelineConfig[]).find((p) => p.id === pipelineIdArg);
     if (!found) {
       void vscode.window.showWarningMessage(
-        `AIDLC: pipeline "${pipelineIdArg}" not found in workspace.yaml.`,
+        `EDLC: pipeline "${pipelineIdArg}" not found in workspace.yaml.`,
       );
       return;
     }
@@ -708,5 +708,5 @@ function surfaceRunError(err: unknown): void {
     return;
   }
   const msg = err instanceof Error ? err.message : String(err);
-  void vscode.window.showErrorMessage(`AIDLC: ${msg}`);
+  void vscode.window.showErrorMessage(`EDLC: ${msg}`);
 }

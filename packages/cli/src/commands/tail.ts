@@ -2,11 +2,11 @@ import * as path from 'path';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
-import { RunStateStore, type RunState, type StepRecord } from '@aidlc/core';
+import { RunStateStore, type RunState, type StepRecord } from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import { colorStatus } from '../runHelpers';
 
-const RUNS_GLOB = '.aidlc/runs/*.json';
+const RUNS_GLOB = '.edlc/runs/*.json';
 
 interface Snapshot {
   status: RunState['status'];
@@ -33,7 +33,7 @@ export function registerTail(program: Command): void {
       console.log(chalk.dim(`tailing ${focus}  ·  ${root}  (Ctrl+C to stop)\n`));
 
       if (seen.size === 0) {
-        console.log(chalk.dim('No runs to watch yet.  Try: aidlc run start <pipelineId>'));
+        console.log(chalk.dim('No runs to watch yet.  Try: edlc run start <pipelineId>'));
       } else {
         for (const [id, snap] of seen) {
           const cur = snap.steps[snap.currentStepIdx];

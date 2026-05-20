@@ -17,13 +17,13 @@ import { EditAgentModal, type EditAgentDraft } from './EditAgentModal';
 
 const scopeLabel: Partial<Record<AgentSummary['scope'], string>> = {
   project: 'PROJECT',
-  aidlc: 'WORKFLOW',
+  edlc: 'WORKFLOW',
   global: 'GLOBAL',
 };
 
 const typeBadgeClass: Partial<Record<AgentSummary['scope'], string>> = {
   project: 'bg-warning/15 text-warning border-warning/30',
-  aidlc: 'bg-primary/15 text-primary border-primary/30',
+  edlc: 'bg-primary/15 text-primary border-primary/30',
   global: 'bg-success/15 text-success border-success/30',
 };
 
@@ -43,7 +43,7 @@ export function AgentCard({
   /** Pickable skills surfaced in the EditAgentModal (project + global). */
   skills: SkillSummary[];
 }) {
-  const isAidlc = agent.scope === 'aidlc';
+  const isAidlc = agent.scope === 'edlc';
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);

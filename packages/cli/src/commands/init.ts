@@ -4,13 +4,13 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 
-const AIDLC_DIR      = '.aidlc';
+const EDLC_DIR      = '.edlc';
 const WORKSPACE_FILE = 'workspace.yaml';
 const SKILLS_DIR     = 'skills';
 const RUNS_DIR       = 'runs';
 
 const STARTER_WORKSPACE = `version: "1.0"
-name: "My AIDLC Workspace"
+name: "My EDLC Workspace"
 
 # Skills are system prompts for your Claude agents.
 # Add a builtin skill (bundled) or point to your own .md file.
@@ -18,7 +18,7 @@ skills: []
 #   - id: code-reviewer
 #     builtin: true
 #   - id: my-skill
-#     path: ./.aidlc/skills/my-skill.md
+#     path: ./.edlc/skills/my-skill.md
 
 # Agents are Claude instances wired to a skill.
 agents: []
@@ -52,52 +52,52 @@ function check(label: string, pass: boolean, info?: string): void {
 export function registerInit(program: Command): void {
   program
     .command('init')
-    .description('Scaffold .aidlc/ workspace for a new project')
-    .option('--name <name>', 'workspace name (written into workspace.yaml)', 'My AIDLC Workspace')
+    .description('Scaffold .edlc/ workspace for a new project')
+    .option('--name <name>', 'workspace name (written into workspace.yaml)', 'My EDLC Workspace')
     .action(async (opts: { name: string }, cmd: Command) => {
       const root    = resolveWorkspaceRoot(cmd);
-      const aidlcDir = path.join(root, AIDLC_DIR);
-      const wsPath   = path.join(aidlcDir, WORKSPACE_FILE);
-      const skillsDir = path.join(aidlcDir, SKILLS_DIR);
-      const runsDir   = path.join(aidlcDir, RUNS_DIR);
+      const edlcDir = path.join(root, EDLC_DIR);
+      const wsPath   = path.join(edlcDir, WORKSPACE_FILE);
+      const skillsDir = path.join(edlcDir, SKILLS_DIR);
+      const runsDir   = path.join(edlcDir, RUNS_DIR);
 
-      console.log(chalk.bold('\naidlc init'));
+      console.log(chalk.bold('\nedlc init'));
       console.log(chalk.dim(`workspace: ${root}\n`));
 
       // workspace.yaml
       if (fs.existsSync(wsPath)) {
-        check(`${AIDLC_DIR}/${WORKSPACE_FILE}`, true, 'already exists — skipped');
+        check(`${EDLC_DIR}/${WORKSPACE_FILE}`, true, 'already exists — skipped');
       } else {
-        fs.mkdirSync(aidlcDir, { recursive: true });
+        fs.mkdirSync(edlcDir, { recursive: true });
         const content = STARTER_WORKSPACE.replace(
-          '"My AIDLC Workspace"',
+          '"My EDLC Workspace"',
           JSON.stringify(opts.name),
         );
         fs.writeFileSync(wsPath, content, 'utf8');
-        check(`${AIDLC_DIR}/${WORKSPACE_FILE}`, true, 'created');
+        check(`${EDLC_DIR}/${WORKSPACE_FILE}`, true, 'created');
       }
 
-      // .aidlc/skills/
+      // .edlc/skills/
       if (!fs.existsSync(skillsDir)) {
         fs.mkdirSync(skillsDir, { recursive: true });
-        check(`${AIDLC_DIR}/${SKILLS_DIR}/`, true, 'created');
+        check(`${EDLC_DIR}/${SKILLS_DIR}/`, true, 'created');
       } else {
-        check(`${AIDLC_DIR}/${SKILLS_DIR}/`, true, 'already exists — skipped');
+        check(`${EDLC_DIR}/${SKILLS_DIR}/`, true, 'already exists — skipped');
       }
 
-      // .aidlc/runs/
+      // .edlc/runs/
       if (!fs.existsSync(runsDir)) {
         fs.mkdirSync(runsDir, { recursive: true });
-        check(`${AIDLC_DIR}/${RUNS_DIR}/`, true, 'created');
+        check(`${EDLC_DIR}/${RUNS_DIR}/`, true, 'created');
       } else {
-        check(`${AIDLC_DIR}/${RUNS_DIR}/`, true, 'already exists — skipped');
+        check(`${EDLC_DIR}/${RUNS_DIR}/`, true, 'already exists — skipped');
       }
 
       console.log();
       console.log(chalk.green('✔') + ' Done. Next steps:');
-      console.log(chalk.dim(`  1. Edit ${chalk.white(`.aidlc/${WORKSPACE_FILE}`)} to add agents, skills, and pipelines`));
-      console.log(chalk.dim(`  2. Run ${chalk.cyan('aidlc validate')} to check the schema`));
-      console.log(chalk.dim(`  3. Run ${chalk.cyan('aidlc doctor')} to verify the Claude binary and env`));
-      console.log(chalk.dim(`  4. Run ${chalk.cyan('aidlc agent add')} to add your first agent (M2)\n`));
+      console.log(chalk.dim(`  1. Edit ${chalk.white(`.edlc/${WORKSPACE_FILE}`)} to add agents, skills, and pipelines`));
+      console.log(chalk.dim(`  2. Run ${chalk.cyan('edlc validate')} to check the schema`));
+      console.log(chalk.dim(`  3. Run ${chalk.cyan('edlc doctor')} to verify the Claude binary and env`));
+      console.log(chalk.dim(`  4. Run ${chalk.cyan('edlc agent add')} to add your first agent (M2)\n`));
     });
 }

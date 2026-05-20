@@ -26,4 +26,4 @@ jobs:
         run: pnpm -r compile
 
       - name: Test core
-        run: pnpm --filter @aidlc/core test
+        run: pnpm --filter @edlc/core test

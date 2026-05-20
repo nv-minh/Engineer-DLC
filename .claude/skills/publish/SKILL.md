@@ -76,7 +76,7 @@ Leave a blank line between the new section and the previous one. Preserve all ex
 
 ## 6. Build + package
 
-> CRITICAL: do NOT just `tsc` and `vsce package` separately. The TS output is unbundled — it `require()`s `@aidlc/core` and `js-yaml`, which aren't shipped with `--no-dependencies`. That produces a VSIX that throws on activation (`command 'aidlc.openBuilder' not found`). The `package` script in [packages/extension/package.json](../../../packages/extension/package.json) does typecheck → esbuild bundle → `vsce package --no-dependencies` in the right order; always go through it.
+> CRITICAL: do NOT just `tsc` and `vsce package` separately. The TS output is unbundled — it `require()`s `@edlc/core` and `js-yaml`, which aren't shipped with `--no-dependencies`. That produces a VSIX that throws on activation (`command 'edlc.openBuilder' not found`). The `package` script in [packages/extension/package.json](../../../packages/extension/package.json) does typecheck → esbuild bundle → `vsce package --no-dependencies` in the right order; always go through it.
 
 Run from the repo root:
 
@@ -84,12 +84,12 @@ Run from the repo root:
 pnpm package:extension
 ```
 
-This script (see root [package.json](../../../package.json)) runs `pnpm --filter aidlc package`, which produces `packages/extension/aidlc-<new-version>.vsix`. The bundled `out/extension.js` should be ~600–700kb; if you see ~10kb, the bundle step didn't run — stop and investigate before publishing.
+This script (see root [package.json](../../../package.json)) runs `pnpm --filter edlc package`, which produces `packages/extension/edlc-<new-version>.vsix`. The bundled `out/extension.js` should be ~600–700kb; if you see ~10kb, the bundle step didn't run — stop and investigate before publishing.
 
 Verify the `.vsix` file exists before moving on:
 
 ```
-ls packages/extension/aidlc-<new-version>.vsix
+ls packages/extension/edlc-<new-version>.vsix
 ```
 
 ## 7. Commit + tag
@@ -105,20 +105,20 @@ Do NOT amend. Do NOT use `--no-verify`.
 ## 8. Publish to Open VSX
 
 ```
-npx -y --registry=https://registry.npmjs.org/ ovsx publish packages/extension/aidlc-<new-version>.vsix -p "$OVSX_PAT"
+npx -y --registry=https://registry.npmjs.org/ ovsx publish packages/extension/edlc-<new-version>.vsix -p "$OVSX_PAT"
 ```
 
 If this fails, the commit and tag already exist locally — report the failure clearly and tell the user:
-> Local commit + tag `v<new-version>` created, but Open VSX publish failed. Fix the error, then retry with `npx -y --registry=https://registry.npmjs.org/ ovsx publish packages/extension/aidlc-<new-version>.vsix -p "$OVSX_PAT"`. Do NOT re-run /publish.
+> Local commit + tag `v<new-version>` created, but Open VSX publish failed. Fix the error, then retry with `npx -y --registry=https://registry.npmjs.org/ ovsx publish packages/extension/edlc-<new-version>.vsix -p "$OVSX_PAT"`. Do NOT re-run /publish.
 
 ## 8b. Publish to VS Code Marketplace
 
 ```
-npx -y --registry=https://registry.npmjs.org/ @vscode/vsce publish --packagePath packages/extension/aidlc-<new-version>.vsix -p "$VSCE_PAT"
+npx -y --registry=https://registry.npmjs.org/ @vscode/vsce publish --packagePath packages/extension/edlc-<new-version>.vsix -p "$VSCE_PAT"
 ```
 
 If this fails, Open VSX already succeeded and the commit/tag exist locally — report the failure and tell the user:
-> Open VSX published + local tag `v<new-version>` created, but VS Code Marketplace publish failed. Fix the error (usually a stale/invalid `VSCE_PAT`), then retry with `npx -y --registry=https://registry.npmjs.org/ @vscode/vsce publish --packagePath packages/extension/aidlc-<new-version>.vsix -p "$VSCE_PAT"`. Do NOT re-run /publish.
+> Open VSX published + local tag `v<new-version>` created, but VS Code Marketplace publish failed. Fix the error (usually a stale/invalid `VSCE_PAT`), then retry with `npx -y --registry=https://registry.npmjs.org/ @vscode/vsce publish --packagePath packages/extension/edlc-<new-version>.vsix -p "$VSCE_PAT"`. Do NOT re-run /publish.
 
 ## 9. Push
 
@@ -131,8 +131,8 @@ git push origin "v<new-version>"
 
 One concise block:
 - New version
-- Open VSX: https://open-vsx.org/extension/hueanmy/aidlc
-- VS Code Marketplace: https://marketplace.visualstudio.com/items?itemName=hueanmy.aidlc
+- Open VSX: https://open-vsx.org/extension/nv-minh/edlc
+- VS Code Marketplace: https://marketplace.visualstudio.com/items?itemName=nv-minh.edlc
 - VSIX filename
 - Commit SHA + tag
 

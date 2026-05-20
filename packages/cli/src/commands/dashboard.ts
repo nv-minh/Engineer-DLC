@@ -12,13 +12,13 @@ import {
   markStepDone,
   PipelineRunError,
   type RunState,
-} from '@aidlc/core';
+} from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import { readYaml } from '../yamlIO';
 import { listEpics } from '../epicsList';
 
-const RUNS_GLOB     = '.aidlc/runs/*.json';
-const WORKSPACE_YML = '.aidlc/workspace.yaml';
+const RUNS_GLOB     = '.edlc/runs/*.json';
+const WORKSPACE_YML = '.edlc/workspace.yaml';
 
 export function registerDashboard(program: Command): void {
   program
@@ -62,7 +62,7 @@ export function registerDashboard(program: Command): void {
           try {
             const doc = readYaml(root);
             res.end(JSON.stringify({
-              name:      doc?.name      ?? 'AIDLC Workspace',
+              name:      doc?.name      ?? 'EDLC Workspace',
               version:   doc?.version   ?? '1.0',
               agents:    doc?.agents    ?? [],
               skills:    doc?.skills    ?? [],
@@ -70,7 +70,7 @@ export function registerDashboard(program: Command): void {
             }));
           } catch (err) {
             res.end(JSON.stringify({
-              name: 'AIDLC Workspace', version: '1.0',
+              name: 'EDLC Workspace', version: '1.0',
               agents: [], skills: [], pipelines: [],
               error: err instanceof Error ? err.message : String(err),
             }));
@@ -243,7 +243,7 @@ function handleAction(req: http.IncomingMessage, res: http.ServerResponse, root:
 const HTML = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
-<title>aidlc dashboard</title>
+<title>edlc dashboard</title>
 <style>
   :root {
     --bg: #0d1117; --panel: #161b22; --panel-2: #1c2128; --border: #30363d;
@@ -394,7 +394,7 @@ const HTML = `<!doctype html>
 <div class="topbar">
   <div class="brand">
     <div class="brand-dot"></div>
-    <span>AIDLC</span>
+    <span>EDLC</span>
   </div>
   <div class="tabs">
     <button class="tab active" data-tab="runs">Runs</button>
@@ -481,7 +481,7 @@ async function refreshRuns() {
 function renderRunsSidebar() {
   const el = document.getElementById('runs-list');
   if (!runs.length) {
-    el.innerHTML = '<div class="empty" style="padding:40px 16px;font-size:13px">No runs yet.<br><br><code>aidlc run start &lt;pipelineId&gt;</code></div>';
+    el.innerHTML = '<div class="empty" style="padding:40px 16px;font-size:13px">No runs yet.<br><br><code>edlc run start &lt;pipelineId&gt;</code></div>';
     return;
   }
   el.innerHTML = runs.map(r => {
@@ -620,7 +620,7 @@ function renderWorkflows() {
   const el = document.getElementById('sub-workflows');
   const pipelines = workspace?.pipelines || [];
   if (!pipelines.length) {
-    el.innerHTML = '<div class="empty">No workflows. Try: <code>aidlc pipeline add</code></div>';
+    el.innerHTML = '<div class="empty">No workflows. Try: <code>edlc pipeline add</code></div>';
     return;
   }
   el.innerHTML = pipelines.map(p => {
@@ -645,7 +645,7 @@ function renderAgents() {
   const el = document.getElementById('sub-agents');
   const agents = workspace?.agents || [];
   if (!agents.length) {
-    el.innerHTML = '<div class="empty">No agents. Try: <code>aidlc agent add</code></div>';
+    el.innerHTML = '<div class="empty">No agents. Try: <code>edlc agent add</code></div>';
     return;
   }
   el.innerHTML = agents.map(a => {
@@ -667,7 +667,7 @@ function renderSkills() {
   const el = document.getElementById('sub-skills');
   const skills = workspace?.skills || [];
   if (!skills.length) {
-    el.innerHTML = '<div class="empty">No skills. Try: <code>aidlc skill add --template hello-world</code></div>';
+    el.innerHTML = '<div class="empty">No skills. Try: <code>edlc skill add --template hello-world</code></div>';
     return;
   }
   el.innerHTML = skills.map(s => {

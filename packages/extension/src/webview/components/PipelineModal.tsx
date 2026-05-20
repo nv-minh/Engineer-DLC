@@ -378,7 +378,7 @@ function StepRow({
               auto_review: v,
               auto_review_runner:
                 v && !step.auto_review_runner
-                  ? `.aidlc/scripts/validate-${step.agent}.mjs`
+                  ? `.edlc/scripts/validate-${step.agent}.mjs`
                   : step.auto_review_runner,
             })
           }
@@ -503,7 +503,7 @@ function StepRow({
             type="text"
             value={step.auto_review_runner ?? ''}
             onChange={(e) => onChange({ auto_review_runner: e.target.value })}
-            placeholder={`.aidlc/scripts/validate-${step.agent}.mjs`}
+            placeholder={`.edlc/scripts/validate-${step.agent}.mjs`}
             spellCheck={false}
             className="w-full rounded border border-border bg-input/50 px-2 py-1 font-mono text-[10.5px] text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40"
           />

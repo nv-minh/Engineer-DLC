@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { validateWorkspace, WorkspaceLoader } from '@aidlc/core';
+import { validateWorkspace, WorkspaceLoader } from '@edlc/core';
 import { requireYaml, writeYaml, existingIds } from '../yamlIO';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 import { parseContext, loadAgentSkills, formatSkillsList } from '../runHelpers';
@@ -48,7 +48,7 @@ export function registerAgent(program: Command): void {
         if (skillIds.size > 0) {
           console.error(chalk.dim(`  Available: ${[...skillIds].join(', ')}`));
         } else {
-          console.error(chalk.dim('  Run: aidlc skill add --id <id> --template hello-world'));
+          console.error(chalk.dim('  Run: edlc skill add --id <id> --template hello-world'));
         }
         process.exit(1);
       }
@@ -74,7 +74,7 @@ export function registerAgent(program: Command): void {
       doc.agents.push(agent);
 
       try {
-        validateWorkspace(doc, '.aidlc/workspace.yaml');
+        validateWorkspace(doc, '.edlc/workspace.yaml');
       } catch (err) {
         console.error(chalk.red('Validation failed — workspace.yaml not written:'));
         console.error(chalk.dim(err instanceof Error ? err.message : String(err)));
@@ -95,7 +95,7 @@ export function registerAgent(program: Command): void {
       if (opts.json) { console.log(JSON.stringify(doc.agents, null, 2)); return; }
 
       if (doc.agents.length === 0) {
-        console.log(chalk.dim('No agents defined. Run: aidlc agent add --id <id> --name <name> --skills <ids>'));
+        console.log(chalk.dim('No agents defined. Run: edlc agent add --id <id> --name <name> --skills <ids>'));
         return;
       }
       for (const a of doc.agents) {

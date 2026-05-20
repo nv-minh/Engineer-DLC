@@ -1,7 +1,7 @@
 # Engineer-DLC
 
 AI-driven SDLC + agent workflow runner — drives Claude through any pipeline you
-declare in `.aidlc/workspace.yaml`. Use it through the VS Code Builder UI or
+declare in `.edlc/workspace.yaml`. Use it through the VS Code Builder UI or
 straight from the terminal.
 
 Integrates [EM-Team](https://github.com/nv-minh/Engineer-team) — a fullstack
@@ -13,9 +13,9 @@ This is a **monorepo** managed with [pnpm workspaces](https://pnpm.io/workspaces
 
 | Package | Path | Purpose |
 |---|---|---|
-| [`aidlc`](packages/extension/) (extension) | `packages/extension/` | VS Code extension. Builder UI for `workspace.yaml`, sidebar for active runs, run-state commands. |
-| [`@aidlc/core`](packages/core/) | `packages/core/` | Pure-TypeScript engine: Zod schema, workspace loader, runner registry (`DefaultRunner` shells out to `claude`), pipeline state machine. **No `import 'vscode'`** — runs identically in CLI / tests / cloud. |
-| [`aidlc`](packages/cli/) (CLI) | `packages/cli/` | Standalone terminal CLI. Manages `workspace.yaml`, drives runs end-to-end via Claude, no VS Code required. See [packages/cli/README.md](packages/cli/README.md). |
+| [`edlc`](packages/extension/) (extension) | `packages/extension/` | VS Code extension. Builder UI for `workspace.yaml`, sidebar for active runs, run-state commands. |
+| [`@edlc/core`](packages/core/) | `packages/core/` | Pure-TypeScript engine: Zod schema, workspace loader, runner registry (`DefaultRunner` shells out to `claude`), pipeline state machine. **No `import 'vscode'`** — runs identically in CLI / tests / cloud. |
+| [`edlc`](packages/cli/) (CLI) | `packages/cli/` | Standalone terminal CLI. Manages `workspace.yaml`, drives runs end-to-end via Claude, no VS Code required. See [packages/cli/README.md](packages/cli/README.md). |
 
 ## Quick start
 
@@ -55,17 +55,17 @@ code --extensionDevelopmentPath=packages/extension .
 ### 3. Use the CLI
 
 ```sh
-aidlc init                              # scaffolds .aidlc/workspace.yaml
-aidlc preset apply code-review          # or: sdlc, release-notes
-aidlc validate                          # check schema
-aidlc doctor                            # verify claude binary + auth
+edlc init                              # scaffolds .edlc/workspace.yaml
+edlc preset apply code-review          # or: sdlc, release-notes
+edlc validate                          # check schema
+edlc doctor                            # verify claude binary + auth
 ```
 
 ### 4. Start a run
 
 ```sh
-aidlc run start review-pipeline --context epic=ABC-123
-aidlc run exec <runId>                  # spawns claude, streams output
+edlc run start review-pipeline --context epic=ABC-123
+edlc run exec <runId>                  # spawns claude, streams output
 ```
 
 ## EM-Team Integration
@@ -103,7 +103,7 @@ Full catalog: `vendor/em-team/skills/SKILL-INDEX.md`
 ```sh
 pnpm install                            # installs all packages + creates symlinks
 pnpm build                              # tsc -r in every package
-pnpm test                               # @aidlc/core unit tests
+pnpm test                               # @edlc/core unit tests
 pnpm package:extension                  # build .vsix for the extension
 ```
 
@@ -113,34 +113,34 @@ The full reference lives in [packages/cli/README.md](packages/cli/README.md).
 
 ### Workspace bootstrap
 ```
-aidlc init                    # scaffold .aidlc/workspace.yaml + skills/ + runs/
-aidlc validate                # parse + Zod-validate workspace.yaml
-aidlc doctor                  # workspace + claude binary + auth + env health checks
-aidlc list [--json]           # print agents, skills, pipelines
+edlc init                    # scaffold .edlc/workspace.yaml + skills/ + runs/
+edlc validate                # parse + Zod-validate workspace.yaml
+edlc doctor                  # workspace + claude binary + auth + env health checks
+edlc list [--json]           # print agents, skills, pipelines
 ```
 
 ### Dynamic config
 ```
-aidlc skill    add | list | show | remove
-aidlc agent    add | list | show | remove
-aidlc pipeline add | list | show | remove
-aidlc preset   apply | save | list
+edlc skill    add | list | show | remove
+edlc agent    add | list | show | remove
+edlc pipeline add | list | show | remove
+edlc preset   apply | save | list
 ```
 
 ### Run lifecycle
 ```
-aidlc run start <pipeline> [--id …] [--context epic=ABC-123]
-aidlc run exec   <runId> [--until …] [--auto-approve] [--dry-run]
-aidlc run approve <runId> [--comment …]
-aidlc run reject  <runId> --reason …
-aidlc run rerun   <runId> [--feedback …]
+edlc run start <pipeline> [--id …] [--context epic=ABC-123]
+edlc run exec   <runId> [--until …] [--auto-approve] [--dry-run]
+edlc run approve <runId> [--comment …]
+edlc run reject  <runId> --reason …
+edlc run rerun   <runId> [--feedback …]
 ```
 
 ### Live observation
 ```
-aidlc watch [runId]           # cli-table3 view, redraws on state change
-aidlc tail  [runId]           # streams transitions as one-line events
-aidlc dashboard [--port …]    # browser UI with action buttons
+edlc watch [runId]           # cli-table3 view, redraws on state change
+edlc tail  [runId]           # streams transitions as one-line events
+edlc dashboard [--port …]    # browser UI with action buttons
 ```
 
 ## Architecture
@@ -161,7 +161,7 @@ aidlc dashboard [--port …]    # browser UI with action buttons
                   └────────┬─────────┘
                            │
                     ┌──────▼──────┐
-                    │ @aidlc/core │  ← shared engine
+                    │ @edlc/core │  ← shared engine
                     │   (no UI)   │
                     └──────┬──────┘
                            │

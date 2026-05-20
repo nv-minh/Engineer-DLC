@@ -4,13 +4,13 @@ import {
   WorkspaceNotFoundError,
   WorkspaceParseError,
   WorkspaceValidationError,
-} from '@aidlc/core';
+} from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 
 export function registerValidate(program: Command): void {
   program
     .command('validate')
-    .description('Validate .aidlc/workspace.yaml against the schema')
+    .description('Validate .edlc/workspace.yaml against the schema')
     .action(async (_opts, cmd: Command) => {
       const root = resolveWorkspaceRoot(cmd);
       try {

@@ -30,7 +30,7 @@ export function useThemeBridge(): {
   mode: ThemeMode;
   setMode: (next: ThemeMode) => void;
 } {
-  const initial = (typeof window !== 'undefined' && window.__AIDLC_INITIAL_THEME__) || 'auto';
+  const initial = (typeof window !== 'undefined' && window.__EDLC_INITIAL_THEME__) || 'auto';
   const [mode, setModeState] = useState<ThemeMode>(initial);
 
   // Apply theme whenever mode changes, plus reapply on VS Code theme switch when mode === 'auto'.

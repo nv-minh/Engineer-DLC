@@ -626,7 +626,7 @@ function advance(next: RunState, idx: number, pipeline: PipelineConfig): RunStat
   // back to `agent` (persona id) — this lets multiple steps sharing a
   // persona stay distinct in the dependency graph (e.g. `test-plan` ⤴
   // from `plan`, `test-cases` ⤴ from `test-plan`, both backed by the
-  // `aidlc-qa` persona).
+  // `edlc-qa` persona).
   const dagId = (i: number): string => normalized[i].name ?? normalized[i].agent;
   const approvedDagIds = new Set(
     next.steps

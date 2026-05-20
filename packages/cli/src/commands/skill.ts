@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { validateWorkspace, WORKSPACE_DIR } from '@aidlc/core';
+import { validateWorkspace, WORKSPACE_DIR } from '@edlc/core';
 import { requireYaml, writeYaml, existingIds } from '../yamlIO';
 import { SKILL_TEMPLATES, TEMPLATE_IDS, findTemplate } from '../skillTemplates';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
@@ -17,7 +17,7 @@ export function registerSkill(program: Command): void {
     .requiredOption('--id <id>', 'unique skill id (e.g. code-reviewer)')
     .option('--template <name>',
       `scaffold .md from a built-in template: ${TEMPLATE_IDS.join(', ')}`)
-    .option('--path <file>', 'relative path to an existing .md file (e.g. .aidlc/skills/my.md)')
+    .option('--path <file>', 'relative path to an existing .md file (e.g. .edlc/skills/my.md)')
     .action((opts: { id: string; template?: string; path?: string }, actionCmd: Command) => {
       const root = resolveWorkspaceRoot(actionCmd);
       const doc  = requireYaml(root);
@@ -46,7 +46,7 @@ export function registerSkill(program: Command): void {
           console.error(chalk.dim(`Available: ${TEMPLATE_IDS.join(', ')}`));
           process.exit(1);
         }
-        // Write the skill .md into .aidlc/skills/
+        // Write the skill .md into .edlc/skills/
         const skillsDir = path.join(root, WORKSPACE_DIR, 'skills');
         fs.mkdirSync(skillsDir, { recursive: true });
         const filename = `${opts.id}.md`;
@@ -68,7 +68,7 @@ export function registerSkill(program: Command): void {
       doc.skills.push(skillEntry);
 
       try {
-        validateWorkspace(doc, '.aidlc/workspace.yaml');
+        validateWorkspace(doc, '.edlc/workspace.yaml');
       } catch (err) {
         console.error(chalk.red('Validation failed — workspace.yaml not written:'));
         console.error(chalk.dim(err instanceof Error ? err.message : String(err)));
@@ -98,7 +98,7 @@ export function registerSkill(program: Command): void {
       if (opts.json) { console.log(JSON.stringify(doc.skills, null, 2)); return; }
 
       if (doc.skills.length === 0) {
-        console.log(chalk.dim('No skills defined. Run: aidlc skill add --id <id> --template hello-world'));
+        console.log(chalk.dim('No skills defined. Run: edlc skill add --id <id> --template hello-world'));
         return;
       }
       for (const s of doc.skills) {

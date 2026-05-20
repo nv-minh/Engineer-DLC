@@ -20,7 +20,7 @@ import {
 } from '../src';
 
 function tmpRoot(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'aidlc-runs-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'edlc-runs-'));
 }
 
 function touch(root: string, rel: string, content = 'x'.repeat(20)): void {
@@ -49,7 +49,7 @@ const PIPELINE_AUTO: PipelineConfig = {
       produces: ['TECH-DESIGN.md'],
       human_review: true,
       auto_review: true,
-      auto_review_runner: '.aidlc/scripts/check-design.mjs',
+      auto_review_runner: '.edlc/scripts/check-design.mjs',
       enabled: true,
     },
   ],
@@ -358,7 +358,7 @@ describe('AutoReviewer — runAutoReview script invocation', () => {
   }
 
   it('invokes a passing validator and returns pass verdict', async () => {
-    const scriptRel = '.aidlc/scripts/pass.mjs';
+    const scriptRel = '.edlc/scripts/pass.mjs';
     writeScript(
       scriptRel,
       `export default async function () {
@@ -393,7 +393,7 @@ describe('AutoReviewer — runAutoReview script invocation', () => {
   });
 
   it('catches script throws and emits a reject verdict', async () => {
-    const scriptRel = '.aidlc/scripts/throws.mjs';
+    const scriptRel = '.edlc/scripts/throws.mjs';
     writeScript(
       scriptRel,
       `export default async function () {
@@ -425,7 +425,7 @@ describe('AutoReviewer — runAutoReview script invocation', () => {
   });
 
   it('rejects when default export is missing', async () => {
-    const scriptRel = '.aidlc/scripts/empty.mjs';
+    const scriptRel = '.edlc/scripts/empty.mjs';
     writeScript(scriptRel, `export const notDefault = 1;`);
     const pipeline: PipelineConfig = {
       id: 'p',

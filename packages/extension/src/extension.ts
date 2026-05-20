@@ -1,8 +1,8 @@
 /**
- * AIDLC Flow extension entry point.
+ * EDLC Flow extension entry point.
  *
  * v2 architecture: workspace.yaml-driven agents/skills/pipelines. The
- * extension is a thin layer over @aidlc/core that adds:
+ * extension is a thin layer over @edlc/core that adds:
  *   - sidebar webview launcher
  *   - main-area Builder panel
  *   - command palette wizards (Add Skill / Add Agent / Add Pipeline)
@@ -22,18 +22,18 @@ import { SidebarWebviewProvider } from './v2/sidebarWebview';
 import { themeManager } from './v2/themeManager';
 import { registerTokenMonitor } from './v2/tokenMonitor';
 import { registerAstGraph } from './v2/astGraph';
-import { WORKSPACE_DIR, WORKSPACE_FILENAME } from '@aidlc/core';
+import { WORKSPACE_DIR, WORKSPACE_FILENAME } from '@edlc/core';
 
 export function activate(context: vscode.ExtensionContext): void {
-  const output = vscode.window.createOutputChannel('AIDLC');
+  const output = vscode.window.createOutputChannel('EDLC');
   context.subscriptions.push(output);
 
-  output.appendLine('Activating AIDLC Flow extension');
+  output.appendLine('Activating EDLC Flow extension');
 
   // No auto-install of workflow agents/skills into ~/.claude/ anymore —
-  // users opt in via `aidlc.installWorkflowGlobals` or via the apply-preset
+  // users opt in via `edlc.installWorkflowGlobals` or via the apply-preset
   // prompt. Keeps the global Claude folder clean by default. To remove
-  // previously-installed files, run `aidlc.uninstallWorkflowGlobals` before
+  // previously-installed files, run `edlc.uninstallWorkflowGlobals` before
   // uninstalling the extension (VS Code has no reliable on-uninstall hook).
 
   // Theme override manager — owns the persisted `auto|light|dark` choice
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext): void {
   themeManager.init(context);
 
   // Commands (Show Workspace Config, Init, Add Skill/Agent/Pipeline, Open
-  // Builder, Open Claude CLI). All under `aidlc.*` namespace.
+  // Builder, Open Claude CLI). All under `edlc.*` namespace.
   const { disposables, presetStore } = registerV2WorkspaceCommands(context, output);
   context.subscriptions.push(...disposables);
 
@@ -92,15 +92,15 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(claudeWatcher);
   }
 
-  // Same for AIDLC scope's agent/skill folders — workspace.yaml is already
+  // Same for EDLC scope's agent/skill folders — workspace.yaml is already
   // watched, but the .md files referenced from it can change independently.
-  const aidlcAssetsWatcher = createAidlcAssetsWatcher();
-  if (aidlcAssetsWatcher) {
+  const edlcAssetsWatcher = createAidlcAssetsWatcher();
+  if (edlcAssetsWatcher) {
     const refresh = () => sidebar.refresh();
-    aidlcAssetsWatcher.onDidChange(refresh, null, context.subscriptions);
-    aidlcAssetsWatcher.onDidCreate(refresh, null, context.subscriptions);
-    aidlcAssetsWatcher.onDidDelete(refresh, null, context.subscriptions);
-    context.subscriptions.push(aidlcAssetsWatcher);
+    edlcAssetsWatcher.onDidChange(refresh, null, context.subscriptions);
+    edlcAssetsWatcher.onDidCreate(refresh, null, context.subscriptions);
+    edlcAssetsWatcher.onDidDelete(refresh, null, context.subscriptions);
+    context.subscriptions.push(edlcAssetsWatcher);
   }
 
   // Watch pipeline run state so the sidebar's "Pipeline runs" section
@@ -123,14 +123,14 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
   );
 
-  // Check for aidlc CLI — prompt once per install if missing.
+  // Check for edlc CLI — prompt once per install if missing.
   checkCliInstalled(context, output);
 
   // Status bar quick-launcher into the Builder.
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
-  status.text = '$(rocket) AIDLC';
-  status.tooltip = 'Open AIDLC Builder';
-  status.command = 'aidlc.openBuilder';
+  status.text = '$(rocket) EDLC';
+  status.tooltip = 'Open EDLC Builder';
+  status.command = 'edlc.openBuilder';
   status.show();
   context.subscriptions.push(status);
 
@@ -149,7 +149,7 @@ export function activate(context: vscode.ExtensionContext): void {
 export function deactivate(): void {}
 
 /**
- * Check if the `aidlc` CLI is on PATH. Runs asynchronously so activation is
+ * Check if the `edlc` CLI is on PATH. Runs asynchronously so activation is
  * never blocked. Prompts once per VS Code install (globalState flag). The flag
  * is set only after the user dismisses/acts on the prompt, so a crashed session
  * doesn't permanently suppress the prompt.
@@ -158,37 +158,37 @@ function checkCliInstalled(
   context: vscode.ExtensionContext,
   output: vscode.OutputChannel,
 ): void {
-  const SEEN_KEY = 'aidlc.cliInstallPromptSeen';
-  const cmd = process.platform === 'win32' ? 'where aidlc' : 'which aidlc';
+  const SEEN_KEY = 'edlc.cliInstallPromptSeen';
+  const cmd = process.platform === 'win32' ? 'where edlc' : 'which edlc';
 
   // Run the check off the activation hot path — no blocking.
   exec(cmd, { timeout: 5000 }, (err, stdout) => {
     if (!err && stdout.trim()) {
-      output.appendLine(`aidlc CLI found: ${stdout.trim()}`);
+      output.appendLine(`edlc CLI found: ${stdout.trim()}`);
       return;
     }
 
-    output.appendLine('aidlc CLI not found on PATH.');
+    output.appendLine('edlc CLI not found on PATH.');
     if (context.globalState.get<boolean>(SEEN_KEY)) { return; }
 
     void vscode.window.showInformationMessage(
-      'The AIDLC CLI (`aidlc`) is not installed. Install it to run agents, manage workspace config, and watch pipeline runs from the terminal.',
+      'The EDLC CLI (`edlc`) is not installed. Install it to run agents, manage workspace config, and watch pipeline runs from the terminal.',
       'Install via npm',
       'Not now',
     ).then((pick) => {
       // Mark seen only after the user responds, so a crashed session re-prompts.
       void context.globalState.update(SEEN_KEY, true);
       if (pick !== 'Install via npm') { return; }
-      const terminal = vscode.window.createTerminal({ name: 'AIDLC CLI Setup' });
-      terminal.sendText('npm install -g aidlc');
+      const terminal = vscode.window.createTerminal({ name: 'EDLC CLI Setup' });
+      terminal.sendText('npm install -g edlc');
       terminal.show();
-      output.appendLine('Opened terminal to run: npm install -g aidlc');
+      output.appendLine('Opened terminal to run: npm install -g edlc');
     });
   });
 }
 
 /**
- * Watcher for `<workspace>/.aidlc/workspace.yaml`. Returns null when no
+ * Watcher for `<workspace>/.edlc/workspace.yaml`. Returns null when no
  * workspace folder is open — caller should re-create the watcher when one
  * opens via `onDidChangeWorkspaceFolders`.
  */
@@ -203,7 +203,7 @@ function createWorkspaceYamlWatcher(): vscode.FileSystemWatcher | null {
 }
 
 /**
- * Watcher for `<workspace>/.aidlc/templates/*.json` — project-scoped user
+ * Watcher for `<workspace>/.edlc/templates/*.json` — project-scoped user
  * templates. Built-in templates ship with the extension and don't change
  * at runtime, so they don't need a watcher.
  */
@@ -233,19 +233,19 @@ function createClaudeAssetsWatcher(): vscode.FileSystemWatcher | null {
 }
 
 /**
- * Watcher for `<workspace>/.aidlc/{skills,agents}/**` — AIDLC-scoped
+ * Watcher for `<workspace>/.edlc/{skills,agents}/**` — EDLC-scoped
  * skill / agent .md files. Workspace.yaml has its own watcher; this one
  * picks up edits to the referenced .md files themselves.
  */
 function createAidlcAssetsWatcher(): vscode.FileSystemWatcher | null {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) { return null; }
-  const pattern = new vscode.RelativePattern(folder, '.aidlc/{skills,agents}/**');
+  const pattern = new vscode.RelativePattern(folder, '.edlc/{skills,agents}/**');
   return vscode.workspace.createFileSystemWatcher(pattern);
 }
 
 /**
- * Watcher for `<workspace>/.aidlc/runs/*.json` — pipeline run state.
+ * Watcher for `<workspace>/.edlc/runs/*.json` — pipeline run state.
  * Triggers a sidebar refresh whenever a step transitions so the
  * Pipeline runs section reflects the new status / step / revision.
  */

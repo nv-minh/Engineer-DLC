@@ -4,7 +4,7 @@
  * One run = one execution of one pipeline against one "subject" (typically an
  * epic key like `EPIC-2100`, but the runner is agnostic — `runId` is just a
  * filesystem-safe identifier). State files live at
- * `<workspace>/.aidlc/runs/<runId>.json` and act as the single source of
+ * `<workspace>/.edlc/runs/<runId>.json` and act as the single source of
  * truth for what step the user is on, which steps passed/failed, and what
  * feedback the human supplied on rejected steps.
  *

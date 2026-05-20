@@ -249,12 +249,12 @@ function hasDagShape(pipeline: PipelineSummary): boolean {
 }
 
 /**
- * Strip the `aidlc-` namespace prefix when displaying built-in identifiers
+ * Strip the `edlc-` namespace prefix when displaying built-in identifiers
  * inside the cramped DAG node chips. The full id stays in the surrounding
  * `title=` tooltip so users can still see the resolved workspace.yaml id.
  */
 function stripAidlcPrefix(id: string): string {
-  return id.startsWith('aidlc-') ? id.slice('aidlc-'.length) : id;
+  return id.startsWith('edlc-') ? id.slice('edlc-'.length) : id;
 }
 
 /**
@@ -373,7 +373,7 @@ function DagFlow({
 function computeDagLevels(pipeline: PipelineSummary): Array<Array<{ step: PipelineStepSummary; idx: number }>> {
   // Key the DAG by step `name` (phase id) when available — multiple
   // steps can share the same `agent` (e.g. three QA phases all backed
-  // by `aidlc-qa`), so keying by agent collapses them onto one node
+  // by `edlc-qa`), so keying by agent collapses them onto one node
   // and breaks `depends_on` lookups that reference phase ids.
   const dagId = (s: PipelineStepSummary): string => s.name ?? s.agent;
   const stepById = new Map<string, { step: PipelineStepSummary; idx: number }>();
@@ -529,7 +529,7 @@ function DagNode({
                 <span className="opacity-60">agent:</span>&nbsp;{stripAidlcPrefix(step.agent)}
               </Badge>
             )}
-            {step.skills?.filter((s: string) => s !== step.name && s !== `aidlc-${step.name}`).map((s: string) => (
+            {step.skills?.filter((s: string) => s !== step.name && s !== `edlc-${step.name}`).map((s: string) => (
               <Badge key={s} title={`Skill — ${s}`}>
                 <span className="opacity-60">skill:</span>&nbsp;{stripAidlcPrefix(s)}
               </Badge>
@@ -687,7 +687,7 @@ function FlowNode({
                 <span className="opacity-60">agent:</span>&nbsp;{stripAidlcPrefix(step.agent)}
               </Badge>
             )}
-            {step.skills?.filter((s: string) => s !== step.name && s !== `aidlc-${step.name}`).map((s: string) => (
+            {step.skills?.filter((s: string) => s !== step.name && s !== `edlc-${step.name}`).map((s: string) => (
               <Badge key={s} title={`Skill — ${s}`}>
                 <span className="opacity-60">skill:</span>&nbsp;{stripAidlcPrefix(s)}
               </Badge>

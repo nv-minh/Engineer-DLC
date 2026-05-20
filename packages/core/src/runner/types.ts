@@ -14,7 +14,7 @@ export interface RunnerContext {
   env: Record<string, string>;
   /** Slash command args, already split. */
   args: string[];
-  /** Absolute path to the user's project root (where .aidlc/ lives). */
+  /** Absolute path to the user's project root (where .edlc/ lives). */
   workspaceRoot: string;
   /** Stream chunk to terminal/output channel. Always full UTF-8 strings. */
   onOutput: (chunk: string) => void;

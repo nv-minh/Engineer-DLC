@@ -1,5 +1,5 @@
 /**
- * `aidlc.installWorkflowGlobals` — multi-pick UI to install one or more
+ * `edlc.installWorkflowGlobals` — multi-pick UI to install one or more
  * built-in workflows' agents + skills into `~/.claude/agents/` and
  * `~/.claude/skills/`.
  *
@@ -56,7 +56,7 @@ export async function installWorkflowGlobalsCommand(
 
   if (toInstall.length === 0) {
     void vscode.window.showInformationMessage(
-      'AIDLC: nothing to install — every selected workflow was already in ~/.claude/.',
+      'EDLC: nothing to install — every selected workflow was already in ~/.claude/.',
     );
     return;
   }
@@ -78,7 +78,7 @@ export async function installWorkflowGlobalsCommand(
     ? ` (skipped ${totalSkipped} user-owned file${totalSkipped === 1 ? '' : 's'})`
     : '';
   void vscode.window.showInformationMessage(
-    `AIDLC: installed ${totalWritten} file${totalWritten === 1 ? '' : 's'} for ${names}${skippedNote}.`,
+    `EDLC: installed ${totalWritten} file${totalWritten === 1 ? '' : 's'} for ${names}${skippedNote}.`,
   );
   // Refresh the Builder so newly installed workflows appear in the Domain
   // dropdown without requiring a manual reload.

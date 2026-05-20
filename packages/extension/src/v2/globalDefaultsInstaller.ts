@@ -6,7 +6,7 @@
  *
  * Naming
  * ------
- * Every file is prefixed with `aidlc-<workflowId>-` so the 8 built-in
+ * Every file is prefixed with `edlc-<workflowId>-` so the 8 built-in
  * workflows can coexist without colliding (each workflow has its own `po`,
  * `tech-lead`, …). This also keeps cf-sdlc-pipeline's existing symlinks at
  * `~/.claude/agents/{po,tech-lead,…}.md` untouched — we never overwrite a
@@ -16,7 +16,7 @@
  * -----------
  * Each installed file starts with a one-line marker:
  *
- *   <!-- AIDLC extension built-in — workflow: <id>, kind: agent|skill, id: <id> -->
+ *   <!-- EDLC extension built-in — workflow: <id>, kind: agent|skill, id: <id> -->
  *
  * - Missing file → write fresh.
  * - File present with our marker → re-write (lets the user pull updates by
@@ -34,7 +34,7 @@ import * as path from 'path';
 import { BUILTIN_WORKFLOWS, type BuiltinWorkflow } from './builtinPresets';
 import { renderTemplate } from './templateRenderer';
 
-const MARKER_PREFIX = '<!-- AIDLC extension built-in';
+const MARKER_PREFIX = '<!-- EDLC extension built-in';
 
 interface InstallReport {
   workflow: string;
@@ -45,7 +45,7 @@ interface InstallReport {
 /**
  * Default workflow ids installed on activation. Only the stack-neutral SDLC
  * pipeline ships globally by default — additional workflows are opt-in via
- * `aidlc.installWorkflowGlobals` (multi-pick) or auto-installed when the
+ * `edlc.installWorkflowGlobals` (multi-pick) or auto-installed when the
  * user applies the matching preset.
  *
  * Rationale: installing all 8 workflows globally on every activation
@@ -70,7 +70,7 @@ export function installGlobalDefaults(
 
 /**
  * Install a specific set of built-in workflows by id. Skips unknown ids
- * silently. Used by `aidlc.installWorkflowGlobals` and by the apply-preset
+ * silently. Used by `edlc.installWorkflowGlobals` and by the apply-preset
  * confirmation flow that asks the user before dropping a workflow's files
  * into global.
  *
@@ -97,7 +97,7 @@ export function installWorkflowGlobalsByIds(
 /**
  * Check whether a workflow's bundled agents + skills are present under
  * `~/.claude/`. Returns `true` only when *every* expected source file has
- * a matching `aidlc-<id>.md` installed. Files are named by source filename,
+ * a matching `edlc-<id>.md` installed. Files are named by source filename,
  * not by workflow, so multiple workflows sharing the same templates folder
  * naturally see the same install state.
  */
@@ -117,7 +117,7 @@ export function isWorkflowGloballyInstalled(extensionPath: string, workflowId: s
     for (const file of fs.readdirSync(srcDir)) {
       if (!file.endsWith('.md')) { continue; }
       const id = file.slice(0, -3);
-      const targetName = `aidlc-${id}.md`;
+      const targetName = `edlc-${id}.md`;
       if (!fs.existsSync(path.join(destDir, targetName))) { return false; }
     }
     return true;
@@ -153,7 +153,7 @@ function installWorkflow(
     for (const file of fs.readdirSync(srcDir)) {
       if (!file.endsWith('.md')) { continue; }
       const id = file.slice(0, -3);
-      const targetName = `aidlc-${id}.md`;
+      const targetName = `edlc-${id}.md`;
       const targetPath = path.join(destDir, targetName);
       const rawSource = fs.readFileSync(path.join(srcDir, file), 'utf8');
       // Render `{{#if STACK}}…{{/if}}` blocks before stamping so the marker
@@ -212,7 +212,7 @@ interface UninstallReport {
  * Overlap-aware via `preserveWorkflowIds`: the caller passes the set of
  * other workflows whose files MUST be kept. Files needed by any preserved
  * workflow are skipped, even if the marker check would otherwise let us
- * delete them. The AIDLC marker check still applies — hand-edited files
+ * delete them. The EDLC marker check still applies — hand-edited files
  * (no marker) are never touched.
  *
  * Missing files are silently ignored so re-running is safe.
@@ -269,9 +269,9 @@ export function uninstallWorkflowGlobalsByIds(
     function removeKind(destDir: string, kind: 'agents' | 'skills'): void {
       if (!fs.existsSync(destDir)) { return; }
       for (const file of fs.readdirSync(destDir)) {
-        if (!file.startsWith('aidlc-') || !file.endsWith('.md')) { continue; }
+        if (!file.startsWith('edlc-') || !file.endsWith('.md')) { continue; }
         // When we know which files this workflow owns (extensionPath given),
-        // skip foreign ones so we don't blindly nuke unrelated AIDLC files.
+        // skip foreign ones so we don't blindly nuke unrelated EDLC files.
         if (filesToCheck && !filesToCheck.has(`${kind}/${file}`)) { continue; }
         // Preserve files still needed by another installed workflow.
         if (preserveSet.has(`${kind}/${file}`)) { report.skipped.push(file); continue; }
@@ -292,7 +292,7 @@ export function uninstallWorkflowGlobalsByIds(
 
 /**
  * Compute the canonical set of installed file names for a workflow's
- * source folder, keyed as `<kind>/aidlc-<id>.md`. Used to drive
+ * source folder, keyed as `<kind>/edlc-<id>.md`. Used to drive
  * overlap-aware uninstall and to feed the preserve set.
  */
 function expectedSourceFiles(extensionPath: string, workflow: BuiltinWorkflow): Set<string> {
@@ -304,7 +304,7 @@ function expectedSourceFiles(extensionPath: string, workflow: BuiltinWorkflow): 
     for (const file of fs.readdirSync(srcDir)) {
       if (!file.endsWith('.md')) { continue; }
       const id = file.slice(0, -3);
-      result.add(`${kind}/aidlc-${id}.md`);
+      result.add(`${kind}/edlc-${id}.md`);
     }
   }
   return result;
@@ -319,7 +319,7 @@ function expectedSourceFiles(extensionPath: string, workflow: BuiltinWorkflow): 
 export function detectGlobalBuiltinSource(filePath: string): string | undefined {
   try {
     const head = fs.readFileSync(filePath, 'utf8').slice(0, 200);
-    const m = head.match(/<!-- AIDLC extension built-in — workflow:\s*([^,\s]+)/);
+    const m = head.match(/<!-- EDLC extension built-in — workflow:\s*([^,\s]+)/);
     if (!m) { return undefined; }
     const workflow = BUILTIN_WORKFLOWS.find((w) => w.id === m[1]);
     return workflow?.name ?? m[1];

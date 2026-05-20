@@ -7,7 +7,7 @@ import {
   WorkspaceLoader,
   WorkspaceNotFoundError,
   RunStateStore,
-} from '@aidlc/core';
+} from '@edlc/core';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 
 interface Check {
@@ -35,18 +35,18 @@ export function registerDoctor(program: Command): void {
     .action((_opts: unknown, cmd: Command) => {
       const root = resolveWorkspaceRoot(cmd);
 
-      console.log(chalk.bold('\naidlc doctor'));
+      console.log(chalk.bold('\nedlc doctor'));
       console.log(chalk.dim(`workspace: ${root}\n`));
 
       // ── Workspace ────────────────────────────────────────────────────────
       const wsChecks: Check[] = [];
       let ws: Awaited<ReturnType<typeof WorkspaceLoader.load>> | null = null;
 
-      const wsPath = path.join(root, '.aidlc', 'workspace.yaml');
+      const wsPath = path.join(root, '.edlc', 'workspace.yaml');
       if (!fs.existsSync(wsPath)) {
-        wsChecks.push(fail('.aidlc/workspace.yaml exists', 'run: aidlc init'));
+        wsChecks.push(fail('.edlc/workspace.yaml exists', 'run: edlc init'));
       } else {
-        wsChecks.push(ok('.aidlc/workspace.yaml exists'));
+        wsChecks.push(ok('.edlc/workspace.yaml exists'));
         try {
           ws = WorkspaceLoader.load(root);
           const c = ws.config;
@@ -150,10 +150,10 @@ export function registerDoctor(program: Command): void {
 
       // ── Run state ────────────────────────────────────────────────────────
       const runChecks: Check[] = [];
-      const runsDir = path.join(root, '.aidlc', 'runs');
+      const runsDir = path.join(root, '.edlc', 'runs');
 
       if (!fs.existsSync(runsDir)) {
-        runChecks.push(ok('.aidlc/runs/', 'no runs yet'));
+        runChecks.push(ok('.edlc/runs/', 'no runs yet'));
       } else {
         const allRuns = RunStateStore.list(root);
         const runFiles = fs.readdirSync(runsDir).filter(f => f.endsWith('.json'));

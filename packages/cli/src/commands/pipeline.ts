@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { validateWorkspace } from '@aidlc/core';
+import { validateWorkspace } from '@edlc/core';
 import { requireYaml, writeYaml, existingIds } from '../yamlIO';
 import { resolveWorkspaceRoot } from '../workspaceRoot';
 
@@ -39,7 +39,7 @@ export function registerPipeline(program: Command): void {
         if (agentIds.size > 0) {
           console.error(chalk.dim(`Available agents: ${[...agentIds].join(', ')}`));
         } else {
-          console.error(chalk.dim('Run: aidlc agent add --id <id> --name <n> --skill <s>'));
+          console.error(chalk.dim('Run: edlc agent add --id <id> --name <n> --skill <s>'));
         }
         process.exit(1);
       }
@@ -71,7 +71,7 @@ export function registerPipeline(program: Command): void {
       doc.pipelines.push(pipeline);
 
       try {
-        validateWorkspace(doc, '.aidlc/workspace.yaml');
+        validateWorkspace(doc, '.edlc/workspace.yaml');
       } catch (err) {
         console.error(chalk.red('Validation failed — workspace.yaml not written:'));
         console.error(chalk.dim(err instanceof Error ? err.message : String(err)));
@@ -93,7 +93,7 @@ export function registerPipeline(program: Command): void {
       if (opts.json) { console.log(JSON.stringify(doc.pipelines, null, 2)); return; }
 
       if (doc.pipelines.length === 0) {
-        console.log(chalk.dim('No pipelines defined. Run: aidlc pipeline add --id <id> --steps agent1,agent2'));
+        console.log(chalk.dim('No pipelines defined. Run: edlc pipeline add --id <id> --steps agent1,agent2'));
         return;
       }
       for (const p of doc.pipelines) {
