@@ -1,8 +1,11 @@
-# AIDLC
+# Engineer-DLC
 
 AI-driven SDLC + agent workflow runner — drives Claude through any pipeline you
 declare in `.aidlc/workspace.yaml`. Use it through the VS Code Builder UI or
 straight from the terminal.
+
+Integrates [EM-Team](https://github.com/nv-minh/Engineer-team) — a fullstack
+engineering system with 82 skills, 35 agents, and 24 workflows.
 
 This is a **monorepo** managed with [pnpm workspaces](https://pnpm.io/workspaces).
 
@@ -10,23 +13,46 @@ This is a **monorepo** managed with [pnpm workspaces](https://pnpm.io/workspaces
 
 | Package | Path | Purpose |
 |---|---|---|
-| [`aidlc`](packages/extension/) (extension) | `packages/extension/` | VS Code extension. Builder UI for `workspace.yaml`, sidebar for active runs, run-state commands. Marketplace + Open VSX as `hueanmy.aidlc`. |
+| [`aidlc`](packages/extension/) (extension) | `packages/extension/` | VS Code extension. Builder UI for `workspace.yaml`, sidebar for active runs, run-state commands. |
 | [`@aidlc/core`](packages/core/) | `packages/core/` | Pure-TypeScript engine: Zod schema, workspace loader, runner registry (`DefaultRunner` shells out to `claude`), pipeline state machine. **No `import 'vscode'`** — runs identically in CLI / tests / cloud. |
 | [`aidlc`](packages/cli/) (CLI) | `packages/cli/` | Standalone terminal CLI. Manages `workspace.yaml`, drives runs end-to-end via Claude, no VS Code required. See [packages/cli/README.md](packages/cli/README.md). |
 
 ## Quick start
 
-### 1. Install the CLI
+### Prerequisites
+
+- **Node.js** >= 20.19 (for Vite 7)
+- **pnpm** >= 10
+- **Claude Code CLI** installed and authenticated
+
+### 1. Clone & setup
 
 ```sh
-# (when published to npm)
-npm install -g aidlc
+git clone https://github.com/nv-minh/Engineer-DLC.git
+cd Engineer-DLC
 
-# (locally during development)
-pnpm install && cd packages/cli && npm link
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Setup EM-Team symlink (~/.claude/em-team/ -> vendor/em-team/)
+bash scripts/setup-em-team.sh
 ```
 
-### 2. Bootstrap a workspace
+### 2. Run the VS Code extension
+
+```sh
+# Open in VS Code
+code .
+
+# Press F5 to launch Extension Development Host
+# Or run directly:
+code --extensionDevelopmentPath=packages/extension .
+```
+
+### 3. Use the CLI
 
 ```sh
 aidlc init                              # scaffolds .aidlc/workspace.yaml
@@ -35,27 +61,42 @@ aidlc validate                          # check schema
 aidlc doctor                            # verify claude binary + auth
 ```
 
-### 3. Start a run, let Claude do the work
+### 4. Start a run
 
 ```sh
 aidlc run start review-pipeline --context epic=ABC-123
-aidlc run exec <runId>                  # spawns claude, streams output, advances on success
-# or fully unattended:
-aidlc run exec <runId> --auto-approve
+aidlc run exec <runId>                  # spawns claude, streams output
 ```
 
-### 4. Watch what's happening
+## EM-Team Integration
+
+This project includes EM-Team as a vendored git submodule at `vendor/em-team/`.
+
+### Available via `em:` prefix
+
+| Category | Count | Examples |
+|---|---|---|
+| Skills | 82 | brainstorming, TDD, code-review, security-audit |
+| Agents | 35 | planner, architect, debugger, code-reviewer |
+| Workflows | 24 | new-feature, bug-fix, security-audit, team-review |
+
+### Key commands
+
+```
+/em:new-feature     — idea to production
+/em:bug-fix         — systematic bug resolution
+/em:code-review     — 5-axis code review
+/em:architect       — architecture & technical design
+/em:ship            — ship workflow (test → PR)
+```
+
+### Update EM-Team
 
 ```sh
-aidlc watch                             # live-rendered table of all runs
-aidlc tail                              # one-line stream of state transitions
-aidlc dashboard                         # browser UI on http://127.0.0.1:8787
+git submodule update --remote vendor/em-team
 ```
 
-### 5. Watch from VS Code
-
-Install the extension. Edits made by either side update within ~200ms because
-both consume the same `.aidlc/workspace.yaml` and `.aidlc/runs/*.json`.
+Full catalog: `vendor/em-team/skills/SKILL-INDEX.md`
 
 ## Repo dev
 
@@ -78,56 +119,29 @@ aidlc doctor                  # workspace + claude binary + auth + env health ch
 aidlc list [--json]           # print agents, skills, pipelines
 ```
 
-### Dynamic config (mirrors the VS Code Builder)
+### Dynamic config
 ```
-aidlc skill    add | list | show | remove           # 5 built-in templates
+aidlc skill    add | list | show | remove
 aidlc agent    add | list | show | remove
 aidlc pipeline add | list | show | remove
-aidlc preset   apply | save | list                  # built-ins: code-review, release-notes, sdlc
+aidlc preset   apply | save | list
 ```
 
-### Epic inspection (mirrors the extension's epics panel)
-```
-aidlc epic list [--status pending|in_progress|done|failed] [--json]
-aidlc epic status <id>        # phase-by-phase view of one epic
-```
-
-### Run lifecycle (sequential, mirrors the upstream PipelineRunner)
+### Run lifecycle
 ```
 aidlc run start <pipeline> [--id …] [--context epic=ABC-123]
-aidlc run mark-done <runId>      # validate produces, advance or await review
-aidlc run approve  <runId> [--comment …]
-aidlc run reject   <runId> --reason …
-aidlc run rerun    <runId> [--feedback …]
-aidlc run delete   <runId> [--force]
-aidlc run open     <runId> [--path]
-aidlc run exec     <runId> [--until …] [--auto-approve] [--dry-run]
-```
-
-### Step control (jump to any step, any order — bypasses sequential gate)
-```
-aidlc step start  <runId> <step>          # → awaiting_work, moves pointer
-aidlc step done   <runId> <step> [--reason …]
-aidlc step skip   <runId> <step>
-aidlc step reset  <runId> <step>          # → pending
-aidlc step set    <runId> <step> <status> # raw any StepStatus
-aidlc step jump   <runId> <step>          # auto-approve earlier pending steps
+aidlc run exec   <runId> [--until …] [--auto-approve] [--dry-run]
+aidlc run approve <runId> [--comment …]
+aidlc run reject  <runId> --reason …
+aidlc run rerun   <runId> [--feedback …]
 ```
 
 ### Live observation
 ```
-aidlc watch [runId]           # cli-table3 view, redraws on any state change
+aidlc watch [runId]           # cli-table3 view, redraws on state change
 aidlc tail  [runId]           # streams transitions as one-line events
-aidlc dashboard [--port …] [--host …]   # browser UI with action buttons
+aidlc dashboard [--port …]    # browser UI with action buttons
 ```
-
-### Agent execution (one-shot, no run state)
-```
-aidlc agent run <agentId> [--message …] [--context epic=ABC-123] [--dry-run]
-```
-
-`<step>` accepts a 0-based index or an agent id. Pass `-w <path>` (or
-`AIDLC_WORKSPACE=<path>`) to point at a workspace other than `cwd`.
 
 ## Architecture
 
@@ -140,8 +154,8 @@ aidlc agent run <agentId> [--message …] [--context epic=ABC-123] [--dry-run]
                   ┌──────────────────┼──────────────────┐
                   │                  │                  │
             ┌─────▼─────┐      ┌─────▼─────┐      ┌─────▼─────┐
-            │  CLI      │      │ Extension │      │  Future   │
-            │  (Node)   │      │  (VS Code)│      │  cloud    │
+            │  CLI      │      │ Extension │      │ EM-Team   │
+            │  (Node)   │      │  (VS Code)│      │ (vendored)│
             └─────┬─────┘      └─────┬─────┘      └───────────┘
                   │                  │
                   └────────┬─────────┘
@@ -154,20 +168,7 @@ aidlc agent run <agentId> [--message …] [--context epic=ABC-123] [--dry-run]
                     ┌──────▼──────┐
                     │ DefaultRunner│ → spawns `claude --print --append-system-prompt …`
                     └─────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │.aidlc/runs/ │  ← state, watched by both UIs (live sync)
-                    │  *.json     │
-                    └─────────────┘
 ```
-
-Both surfaces read and write the same files; the OS handles atomic renames so
-neither side ever sees a half-written run state.
-
-## Marketplace
-
-- **VS Code Marketplace**: [hueanmy.aidlc](https://marketplace.visualstudio.com/items?itemName=hueanmy.aidlc)
-- **Open VSX**: [hueanmy.aidlc](https://open-vsx.org/extension/hueanmy/aidlc)
 
 ## License
 
